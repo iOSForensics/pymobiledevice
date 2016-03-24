@@ -243,11 +243,16 @@ class LockdownClient(object):
                 return r.data
             return r
 
-    def setValue(self, domain=None, key=None):
+    def setValue(self, domain=None, key=None, value=None):
+        if not value:
+            print "No value passed, returning"
+            return
 
         req = {"Request":"SetValue", "Label": self.label}
 
-        if domain:
+        req["Value"] = value
+
+        if domain:  
             req["Domain"] = domain
         if key:
             req["Key"] = key
