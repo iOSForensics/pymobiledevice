@@ -23,7 +23,7 @@
 #
 
 
-from lockdown import LockdownClient
+from .lockdown import LockdownClient
 from pprint import pprint
 import plistlib
 from optparse import OptionParser
@@ -138,7 +138,7 @@ class DIAGClient(object):
 
 
     def stop_session(self):
-        print "Disconecting..."
+        print("Disconecting...")
         self.service.close()
 
 
@@ -243,6 +243,6 @@ if __name__ == "__main__":
         res = diag.action(options.cmd)
  
     if res:
-        for k in res.keys():
-            print " %s \t: %s" % (k,res[k])
+        for k in list(res.keys()):
+            print(" %s \t: %s" % (k,res[k]))
         

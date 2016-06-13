@@ -72,7 +72,7 @@ def makeCert(req, caPkey):
     #if not req.verify(woop.pkey):
     if not req.verify(pkey):
         # XXX What error object should I use?
-        raise ValueError, 'Error verifying request'
+        raise ValueError('Error verifying request')
     sub = req.get_subject()
     # If this were a real certificate request, you would display
     # all the relevant data from the request and ask a human operator
@@ -130,10 +130,10 @@ def ca_do_everything(DevicePublicKey):
 if __name__ == '__main__':
     rsa = generateRSAKey()
     pkey = makePKey(rsa)
-    print pkey.as_pem(None)
+    print(pkey.as_pem(None))
     req = makeRequest(pkey, "The Issuer Monkey")
     #print req.as_text()
     cert = makeCert(req, pkey)
-    print cert.as_text()
+    print(cert.as_text())
     cert.save_pem('my_ca_cert.pem')
     rsa.save_key('my_key.pem', None)

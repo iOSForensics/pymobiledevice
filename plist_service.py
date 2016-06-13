@@ -23,8 +23,8 @@
 #
 
 
-from usbmux import usbmux
-from util.bplist import BPlistReader
+from .usbmux import usbmux
+from .util.bplist import BPlistReader
 import plistlib
 import ssl
 import struct
@@ -47,10 +47,10 @@ class PlistService(object):
                 for d in mux.devices:
                     if d.serial == udid:
                         dev = d
-                        print "Connecting to device: " + dev.serial
+                        print("Connecting to device: " + dev.serial)
             else:
                 dev = mux.devices[0]
-                print "Connecting to device: " + dev.serial
+                print("Connecting to device: " + dev.serial)
 
         try:
             self.s = mux.connect(dev, self.port)
@@ -68,7 +68,7 @@ class PlistService(object):
         try:
             self.s.send(data)
         except:
-            print "Sending data to device failled"
+            print("Sending data to device failled")
             return -1
         return 0
 

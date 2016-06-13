@@ -236,11 +236,11 @@ class USBMux(object):
 
 if __name__ == "__main__":
 	mux = USBMux()
-	print "Waiting for devices..."
+	print("Waiting for devices...")
 	if not mux.devices:
 		mux.process(0.1)
 	while True:
-		print "Devices:"
+		print("Devices:")
 		for dev in mux.devices:
-			print dev
+			print(dev)
 		mux.process()

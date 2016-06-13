@@ -193,7 +193,7 @@ class BPlistReader(object):
                 return newArr
             if type(obj) == dict:
                 newDic = {}
-                for k,v in obj.iteritems():
+                for k,v in obj.items():
                     rk = self.__resolveObject(k)
                     rv = self.__resolveObject(v)
                     newDic[rk] = rv
@@ -216,7 +216,7 @@ class BPlistReader(object):
         self.offset_table = self.data[self.table_offset:-32]
         self.offsets = []
         ot = self.offset_table
-        for i in xrange(self.number_of_objects):
+        for i in range(self.number_of_objects):
             offset_entry = ot[:self.offset_size]
             ot = ot[self.offset_size:]
             self.offsets.append(self.__unpackIntStruct(self.offset_size, offset_entry))

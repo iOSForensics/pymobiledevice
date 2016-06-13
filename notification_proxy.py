@@ -22,10 +22,10 @@
 #
 #
 
-from lockdown import LockdownClient
+from .lockdown import LockdownClient
 from pprint import pprint
 import plistlib
-import thread
+import _thread
 import time
 
 # NP Client to device Notifications (post_notification) 
@@ -69,7 +69,7 @@ class NPClient(object):
 
 
     def stop_session(self):
-        print "Disconecting..."
+        print("Disconecting...")
         self.service.close()
 
 
@@ -86,7 +86,7 @@ class NPClient(object):
             if res.get("Command") == "ProxyDeath":
                 return res.get("Command")
             else:
-                print "Got unknown NotificationProxy command %s" % res.get("Command")
+                print("Got unknown NotificationProxy command %s" % res.get("Command"))
                 pprint(res)
         return None
 
@@ -94,7 +94,7 @@ class NPClient(object):
     def observe_notification(self, notification):
         #Tells the device to send a notification on the specified event
         
-        print "Observing %s" % notification
+        print("Observing %s" % notification)
         self.service.sendPlist({"Command": "ObserveNotification",
                                 "Name": notification})
 
@@ -109,9 +109,9 @@ class NPClient(object):
                     return res.get("Name")
             
             elif res.get("Command") == "ProxyDeath":
-                    print "NotificationProxy died!"
+                    print("NotificationProxy died!")
             else:
-                print "Got unknown NotificationProxy command %s" % res.get("Command")
+                print("Got unknown NotificationProxy command %s" % res.get("Command"))
                 pprint(res)
         return None  
 
@@ -128,9 +128,9 @@ class NPClient(object):
             if np_name:
                 userdata = args.get("userdata")
                 try:
-                    thread.start_new_thread( args.get("callback") , (np_name, userdata, ) )
+                    _thread.start_new_thread( args.get("callback") , (np_name, userdata, ) )
                 except:
-                    print "Error: unable to start thread"
+                    print("Error: unable to start thread")
 
 
     def subscribe(self, notification, cb, data=None):
@@ -143,9 +143,9 @@ class NPClient(object):
         }
 
         try:
-            thread.start_new_thread( self.notifier, ("NotificationProxyNotifier_"+notification, np_data, ) )
+            _thread.start_new_thread( self.notifier, ("NotificationProxyNotifier_"+notification, np_data, ) )
         except:
-            print "Error: unable to start thread"
+            print("Error: unable to start thread")
 
         while(1):
             time.sleep(1)
@@ -153,8 +153,8 @@ class NPClient(object):
 
 
 def cb_test(name,data=None):
-    print "Got Notification >> %s" % name
-    print "Data:"
+    print("Got Notification >> %s" % name)
+    print("Data:")
     pprint(data)
 
 

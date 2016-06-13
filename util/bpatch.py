@@ -3,7 +3,7 @@ import os, sys
 import bz2
 from array import array
 import struct
-import cStringIO as StringIO
+import io as StringIO
 
 def patch(old_file_name, new_file_name, patch_file_name):
     
@@ -58,7 +58,7 @@ def offtin(buf):
 
 if __name__ == '__main__': 
 	if(len(sys.argv) < 4):
-		print "bpatch: usage: python bpatch.py oldfile newfile patchfile"
+		print("bpatch: usage: python bpatch.py oldfile newfile patchfile")
 	else:
 		old_file_name   = sys.argv[1]
 		new_file_name   = sys.argv[2]

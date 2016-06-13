@@ -23,11 +23,11 @@
 #
 
 
-from lockdown import LockdownClient
+from .lockdown import LockdownClient
 from optparse import OptionParser
 from pprint import pprint
 import plistlib
-from util import read_file
+from .util import read_file
 
 class MobileConfigService(object):
     def __init__(self, lockdown):
@@ -38,7 +38,7 @@ class MobileConfigService(object):
         self.service.sendPlist({"RequestType":"GetProfileList"})
         res = self.service.recvPlist()
         if res.get("Status") != "Acknowledged":
-            print "GetProfileList error"
+            print("GetProfileList error")
             pprint(res)
             return
         return res
@@ -52,8 +52,8 @@ class MobileConfigService(object):
         profiles = self.GetProfileList()
         if not profiles:
             return
-        if not profiles["ProfileMetadata"].has_key(ident):
-            print "Trying to remove not installed profile %s" % ident
+        if ident not in profiles["ProfileMetadata"]:
+            print("Trying to remove not installed profile %s" % ident)
             return
         meta = profiles["ProfileMetadata"][ident]
         pprint(meta)

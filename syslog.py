@@ -23,10 +23,10 @@
 #
 
 
-from lockdown import LockdownClient
+from .lockdown import LockdownClient
 from datetime import datetime
-from util import getHomePath
-from util import hexdump
+from .util import getHomePath
+from .util import hexdump
 from sys import exit
 from optparse import OptionParser
 
@@ -59,7 +59,7 @@ class Syslog(object):
                 if len(d.split(" ")) > 4 and  not procFilter.search(d):
                     continue
 
-            print d.strip("\n\x00\x00")
+            print(d.strip("\n\x00\x00"))
 
             if logFile:
                 with open(logFile, 'a') as f:
@@ -79,7 +79,7 @@ if __name__ == "__main__":
                 syslog = Syslog()
                 syslog.watch(procName=options.procName,logFile=options.logFile)
             except KeyboardInterrupt:
-                print "KeyboardInterrupt caught"
+                print("KeyboardInterrupt caught")
                 raise
             else:
                 pass

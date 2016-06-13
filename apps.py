@@ -23,9 +23,9 @@
 #
 
 
-from lockdown import LockdownClient
+from .lockdown import LockdownClient
 from pprint import pprint
-from afc import AFCClient, AFCShell
+from .afc import AFCClient, AFCShell
 from optparse import OptionParser
 import os
 import warnings
@@ -49,7 +49,7 @@ def house_arrest(lockdown, applicationId):
     mis.sendPlist({"Command": "VendDocuments", "Identifier": applicationId})
     res = mis.recvPlist()
     if res.get("Error"):
-        print "Unable to Lookup the selected application: You probably trying to access to a system app..."
+        print("Unable to Lookup the selected application: You probably trying to access to a system app...")
         return None
     return AFCClient(lockdown, service=mis)
 
@@ -88,9 +88,9 @@ def mobile_install(lockdown,ipaPath):
             break
         completion = z.get('PercentComplete')
         if completion:
-            print 'Installing, %s: %s %% Complete' % (ipaPath, z['PercentComplete'])
+            print('Installing, %s: %s %% Complete' % (ipaPath, z['PercentComplete']))
         if z.get('Status') == 'Complete':
-            print "Installation %s\n" % z['Status']
+            print("Installation %s\n" % z['Status'])
             break
 
 def list_apps(lockdown):
@@ -98,11 +98,11 @@ def list_apps(lockdown):
     #print
     mci.sendPlist({"Command":"Lookup"})
     res = mci.recvPlist()
-    for app in res["LookupResult"].values():
+    for app in list(res["LookupResult"].values()):
         if app.get("ApplicationType") != "System":
-            print app["CFBundleIdentifier"], "=>", app.get("Container")
+            print(app["CFBundleIdentifier"], "=>", app.get("Container"))
         else:
-            print app["CFBundleIdentifier"], "=> N/A"
+            print(app["CFBundleIdentifier"], "=> N/A")
 
 
 def get_apps_BundleID(lockdown,appType="User"):
@@ -110,7 +110,7 @@ def get_apps_BundleID(lockdown,appType="User"):
     mci = lockdown.startService("com.apple.mobile.installation_proxy")
     mci.sendPlist({"Command":"Lookup"})
     res = mci.recvPlist()
-    for app in res["LookupResult"].values():
+    for app in list(res["LookupResult"].values()):
         if app.get("ApplicationType")  == appType:
             appList.append(app["CFBundleIdentifier"])
         #else: #FIXME

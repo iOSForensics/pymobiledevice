@@ -1,8 +1,8 @@
 import glob
 import plistlib
 import os
-from bplist import BPlistReader
-import cPickle
+from .bplist import BPlistReader
+import pickle
 import gzip
 from optparse import *
 
@@ -85,7 +85,7 @@ def convert_bytes(bytes):
 
 def xor_strings(a,b):
     r=""
-    for i in xrange(len(a)):
+    for i in range(len(a)):
         r+= chr(ord(a[i])^ord(b[i]))
     return r
 
@@ -93,33 +93,33 @@ hex = lambda data: " ".join("%02X" % ord(i) for i in data)
 ascii = lambda data: "".join(c if 31 < ord(c) < 127 else "." for c in data)
 
 def hexdump(d):
-    for i in xrange(0,len(d),16):
+    for i in range(0,len(d),16):
         data = d[i:i+16]
-        print "%08X | %s | %s" % (i, hex(data).ljust(47), ascii(data))
+        print("%08X | %s | %s" % (i, hex(data).ljust(47), ascii(data)))
 
 def search_plist(directory, matchDict):
     for p in map(os.path.normpath, glob.glob(directory + "/*.plist")):
         try:
             d = plistlib.readPlist(p)
             ok = True
-            for k,v in matchDict.items():
+            for k,v in list(matchDict.items()):
                 if d.get(k) != v:
                     ok = False
                     break
             if ok:
-                print "Using plist file %s" % p
+                print("Using plist file %s" % p)
                 return d
         except:
             continue
 
 def save_pickle(filename,data):
     f = gzip.open(filename,"wb")
-    cPickle.dump(data, f, cPickle.HIGHEST_PROTOCOL)
+    pickle.dump(data, f, pickle.HIGHEST_PROTOCOL)
     f.close()
 
 def load_pickle(filename):
     f = gzip.open(filename,"rb")
-    data = cPickle.load(f)
+    data = pickle.load(f)
     f.close()
     return data
 

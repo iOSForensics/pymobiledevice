@@ -317,16 +317,16 @@ def is_nsmutabledictionary(obj):
     if not isinstance(obj, dict):
         #print("not dict")
         return False
-    if "$class" not in obj.keys():
+    if "$class" not in list(obj.keys()):
         #print("no class")
         return False
     if obj["$class"].get("$classname") != "NSMutableDictionary":
         #print("wrong class")
         return False
-    if "NS.keys" not in obj.keys():
+    if "NS.keys" not in list(obj.keys()):
         #print("no keys")
         return False
-    if "NS.objects" not in obj.keys():
+    if "NS.objects" not in list(obj.keys()):
         #print("no objects")
         return False
 

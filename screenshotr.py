@@ -23,7 +23,7 @@
 #
 
 
-from lockdown import LockdownClient
+from .lockdown import LockdownClient
 from pprint import pprint
 import plistlib
 from time import gmtime, strftime
@@ -77,7 +77,7 @@ if __name__ == '__main__':
     if data:
         filename = strftime('screenshot-%Y-%m-%d-%H-%M-%S.tif',gmtime()) 
         outPath = os.path.join(outPath, filename)
-        print 'Saving Screenshot at %s' % outPath
+        print('Saving Screenshot at %s' % outPath)
         o = open(outPath,'wb')
         o.write(data)
  

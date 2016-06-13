@@ -28,7 +28,7 @@ NIL = N
 
 def decompress_lzss(str):
     if str[:8] !="complzss":
-        print "decompress_lzss: complzss magic missing"
+        print("decompress_lzss: complzss magic missing")
         return
     decompsize = struct.unpack(">L", str[12:16])[0]
     text_buf = array("B", " "*(N + F - 1))
@@ -62,7 +62,7 @@ def decompress_lzss(str):
             j = src[srcidx]; srcidx += 1
             i |= ((j & 0xF0) << 4)
             j  =  (j & 0x0F) + THRESHOLD
-            for k in xrange(j+1):
+            for k in range(j+1):
                 c = text_buf[(i + k) & (N - 1)]
                 dst[dstidx] = c; dstidx += 1
                 text_buf[r] = c; r += 1

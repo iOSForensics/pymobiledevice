@@ -22,10 +22,10 @@
 #
 #
 
-from lockdown import LockdownClient
+from .lockdown import LockdownClient
 from optparse import OptionParser
 import os
-from afc import AFCClient
+from .afc import AFCClient
 
 
 client_options = {
@@ -57,9 +57,9 @@ class installation_proxy(object):
             completion = z.get("PercentComplete")
             if completion:
                 if handler:
-                    print "calling handler"
+                    print("calling handler")
                     handler(completion,*args)
-                print "%s %% Complete" % z.get("PercentComplete")
+                print("%s %% Complete" % z.get("PercentComplete"))
             if z.get("Status") == "Complete":
                 return z.get("Status")
         return "Error"
@@ -70,7 +70,7 @@ class installation_proxy(object):
             cmd.update(options)
         self.service.sendPlist(cmd)
         #print "%s : " % (cmd, bundleID)
-        print "%s : %s\n" % (cmd, self.watch_completion(handler, *args))
+        print("%s : %s\n" % (cmd, self.watch_completion(handler, *args)))
 
 
     def uninstall(self,bundleID, options=None, handler=None, *args):
@@ -84,7 +84,7 @@ class installation_proxy(object):
             cmd.update(options)
         self.service.sendPlist(cmd)
 #         print "%s : " % (cmd, bundleID)
-        print "%s : %s\n" % (cmd, self.watch_completion(handler, args))
+        print("%s : %s\n" % (cmd, self.watch_completion(handler, args)))
 
 
     def install(self,ipaPath, options=None, handler=None, *args):
@@ -125,16 +125,16 @@ class installation_proxy(object):
 
 
     def get_apps(self,appTypes=["User"]):
-        return [app for app in self.apps_info().values()
+        return [app for app in list(self.apps_info().values())
                 if app.get("ApplicationType") in appTypes]
 
 
     def print_apps(self, appType=["User"]):
         for app in self.get_apps(appType):
-            print ("%s : %s => %s" %  (app.get("CFBundleDisplayName"),
+            print(("%s : %s => %s" %  (app.get("CFBundleDisplayName"),
                                       app.get("CFBundleIdentifier"),
                                       app.get("Path") if app.get("Path")
-                                      else app.get("Container"))).encode('utf-8')
+                                      else app.get("Container"))).encode('utf-8'))
 
 
     def get_apps_bid(self,appTypes=["User"]):
