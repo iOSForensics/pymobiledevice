@@ -30,7 +30,7 @@ except ImportError:
 
 setup(
     name='pymobiledevice',
-    version='0.0.1',
+    version='0.0.2',
     description="Interface with iOS devices",
     long_description=long_description,
     url='https://github.com/appknox/pymobiledevice',
