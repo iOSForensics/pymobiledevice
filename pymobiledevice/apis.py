@@ -31,6 +31,17 @@ class AppManager(object):
         self.service = self.lockdown.startService(
             "com.apple.mobile.installation_proxy")
 
+    def run_command(self, cmd):
+        self.service.sendPlist(cmd)
+        z = self.service.recvPlist()
+        while 'PercentComplete' in z:
+            if not z:
+                break
+            if z.get("Status") == "Complete":
+                return z.get("Status")
+            z = self.service.recvPlist()
+        return z
+
     def install_ipa(self, ipa_path):
         """
         docstring for install_ipa
@@ -39,16 +50,16 @@ class AppManager(object):
         afc.set_file_contents(
             path.basename(ipa_path), open(ipa_path, "rb").read())
         cmd = {"Command": "Install", "PackagePath": path.basename(ipa_path)}
-        return self.service.sendPlist(cmd)
+        return self.run_command(cmd)
 
     def uninstall_ipa(self, bundle_id):
         cmd = {"Command": "Uninstall", "ApplicationIdentifier": bundle_id}
-        return self.service.sendPlist(cmd)
+        return self.run_command(cmd)
 
     def list_ipas(self):
         cmd = {"Command": "Lookup"}
-        self.service.sendPlist(cmd)
-        apps_details = self.service.recvPlist().get("LookupResult")
+        result = self.run_command(cmd)
+        apps_details = result.get("LookupResult")
         apps = []
         for app in apps_details:
             if apps_details[app]['ApplicationType'] == 'User':
