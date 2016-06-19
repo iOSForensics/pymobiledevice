@@ -17,7 +17,7 @@ class BPListWriter(object):
 
         Generates bplist
         '''
-        self.data = 'bplist00'
+        self.data = b'bplist00'
 
         # TODO: flatten objects and count max length size
 
@@ -34,7 +34,7 @@ class BPListWriter(object):
 
         Writes bplist to file
         '''
-        if self.bplist != "":
+        if self.bplist != b"":
             pass
             # TODO: save self.bplist to file
         else:
@@ -228,7 +228,7 @@ class BPlistReader(object):
 
     def parse(self):
         # read header
-        if self.data[:8] != 'bplist00':
+        if self.data[:8] != b'bplist00':
             raise Exception('Bad magic')
 
         # read trailer

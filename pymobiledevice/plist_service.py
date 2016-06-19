@@ -28,7 +28,6 @@ from pymobiledevice.util.bplist import BPlistReader
 import plistlib
 import ssl
 import struct
-from pprint import pprint
 from re import sub
 
 

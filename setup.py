@@ -52,7 +52,7 @@ setup(
     entry_points='',
     install_requires=[
         'ak_vendor',
-        'M2Crypto',
+        'ak_construct',
     ],
     extras_require={
         'dev': [''],
