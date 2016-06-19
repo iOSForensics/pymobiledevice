@@ -49,8 +49,8 @@ class installation_proxy(object):
             "com.apple.mobile.installation_proxy")
 
     def watch_completion(self, handler=None, *args):
-        while True:
-            z = self.service.recvPlist()
+        z = self.service.recvPlist()
+        while 'PercentComplete' in z:
             if not z:
                 break
             completion = z.get("PercentComplete")
@@ -61,7 +61,8 @@ class installation_proxy(object):
                 print("%s %% Complete" % z.get("PercentComplete"))
             if z.get("Status") == "Complete":
                 return z.get("Status")
-        return "Error"
+            z = self.service.recvPlist()
+        print(z)
 
     def send_cmd_for_bid(self, bundleID, cmd="Archive", options=None, handler=None, *args):
         cmd = {"Command": cmd, "ApplicationIdentifier": bundleID}
@@ -180,7 +181,7 @@ if __name__ == "__main__":
         instpxy.install(options.install_ipapath)
     elif options.remove_bundleid:
         instpxy = installation_proxy()
-        instpxy.remove(options.remove_bundleid)
+        instpxy.uninstall(options.remove_bundleid)
     elif options.upgrade_bundleid:
         instpxy = installation_proxy()
         instpxy.upgrade(options.upgrade_bundleid)

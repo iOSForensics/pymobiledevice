@@ -145,6 +145,8 @@ class AFCClient(object):
             afcpack.this_length = this_length
         header = AFCPacket.build(afcpack)
         self.packet_num += 1
+        if isinstance(data, str):
+            data = data.encode()
         self.service.send(header + data)
 
     def receive_data(self):
@@ -168,7 +170,7 @@ class AFCClient(object):
         try:
             self.dispatch_packet(opcode, data)
             return self.receive_data()
-        except:
+        except ImportError:
             self.lockdown = LockdownClient()
             self.service = self.lockdown.startService(self.serviceName)
             return self.do_operation(opcode, data)
@@ -230,7 +232,7 @@ class AFCClient(object):
 
     def file_open(self, filename, mode=AFC_FOPEN_RDONLY):
         status, data = self.do_operation(
-            AFC_OP_FILE_OPEN, struct.pack("<Q", mode) + filename + "\x00")
+            AFC_OP_FILE_OPEN, struct.pack("<Q", mode).decode() + filename + "\x00")
         return struct.unpack("<Q", data)[0] if data else None
 
     def file_close(self, handle):
@@ -273,7 +275,7 @@ class AFCClient(object):
     def file_write(self, handle, data):
         MAXIMUM_WRITE_SIZE = 1 << 15
         hh = struct.pack("<Q", handle)
-        segments = len(data) / MAXIMUM_WRITE_SIZE
+        segments = int(len(data) / MAXIMUM_WRITE_SIZE)
         try:
             for i in range(segments):
                 self.dispatch_packet(AFC_OP_WRITE,
@@ -290,9 +292,9 @@ class AFCClient(object):
                                      hh + data[segments * MAXIMUM_WRITE_SIZE:],
                                      this_length=48)
                 s, d = self.receive_data()
-        except:
+        except ImportError:
             self.lockdown = LockdownClient()
-            self.service = lockdown.startService(serviceName)
+            self.service = self.lockdown.startService(serviceName)
             self.file_write(handle, data)
         return s
 
@@ -313,7 +315,6 @@ class AFCClient(object):
             d = self.file_read(h, int(info["st_size"]))
             self.file_close(h)
             return d
-            return
 
     def set_file_contents(self, filename, data):
         h = self.file_open(filename, AFC_FOPEN_WR)
