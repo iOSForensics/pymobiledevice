@@ -1,5 +1,0 @@
-ak_vendor
-
-[dev]
-
-[test]
