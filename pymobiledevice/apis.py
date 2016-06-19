@@ -15,53 +15,52 @@ Date created: 2016-06-19
 from os import path
 # from pprint import pprint
 
-from pymobiledevice.afc import AFCClient
-from pymobiledevice.lockdown import LockdownClient
+
+def get_lockdown_and_service(udid):
+    from pymobiledevice.lockdown import LockdownClient
+    lockdown = LockdownClient(udid)
+    service = lockdown.startService("com.apple.mobile.installation_proxy")
+    return lockdown, service
 
 
-class AppManager(object):
+def run_command(service, uuid, cmd):
+    service.sendPlist(cmd)
+    z = service.recvPlist()
+    while 'PercentComplete' in z:
+        if not z:
+            break
+        if z.get("Status") == "Complete":
+            return z.get("Status")
+        z = service.recvPlist()
+    return z
+
+
+def install_ipa(uuid, ipa_path):
     """
-    The App Manager
+    docstring for install_ipa
     """
+    from pymobiledevice.afc import AFCClient
+    lockdown, service = get_lockdown_and_service(uuid)
+    afc = AFCClient(lockdown=lockdown)
+    afc.set_file_contents(
+        path.basename(ipa_path), open(ipa_path, "rb").read())
+    cmd = {"Command": "Install", "PackagePath": path.basename(ipa_path)}
+    return run_command(service, uuid, cmd)
 
-    def __init__(self, udid):
-        super(AppManager, self).__init__()
-        self.udid = udid
-        self.lockdown = LockdownClient(udid)
-        self.service = self.lockdown.startService(
-            "com.apple.mobile.installation_proxy")
 
-    def run_command(self, cmd):
-        self.service.sendPlist(cmd)
-        z = self.service.recvPlist()
-        while 'PercentComplete' in z:
-            if not z:
-                break
-            if z.get("Status") == "Complete":
-                return z.get("Status")
-            z = self.service.recvPlist()
-        return z
+def uninstall_ipa(uuid, bundle_id):
+    lockdown, service = get_lockdown_and_service(uuid)
+    cmd = {"Command": "Uninstall", "ApplicationIdentifier": bundle_id}
+    return run_command(service, uuid, cmd)
 
-    def install_ipa(self, ipa_path):
-        """
-        docstring for install_ipa
-        """
-        afc = AFCClient(lockdown=self.lockdown)
-        afc.set_file_contents(
-            path.basename(ipa_path), open(ipa_path, "rb").read())
-        cmd = {"Command": "Install", "PackagePath": path.basename(ipa_path)}
-        return self.run_command(cmd)
 
-    def uninstall_ipa(self, bundle_id):
-        cmd = {"Command": "Uninstall", "ApplicationIdentifier": bundle_id}
-        return self.run_command(cmd)
-
-    def list_ipas(self):
-        cmd = {"Command": "Lookup"}
-        result = self.run_command(cmd)
-        apps_details = result.get("LookupResult")
-        apps = []
-        for app in apps_details:
-            if apps_details[app]['ApplicationType'] == 'User':
-                apps.append(app)
-        return apps
+def list_ipas(uuid):
+    lockdown, service = get_lockdown_and_service(uuid)
+    cmd = {"Command": "Lookup"}
+    result = run_command(service, uuid, cmd)
+    apps_details = result.get("LookupResult")
+    apps = []
+    for app in apps_details:
+        if apps_details[app]['ApplicationType'] == 'User':
+            apps.append(app)
+    return apps
