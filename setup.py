@@ -14,25 +14,15 @@ Date created: 2015-11-24
 """
 
 from setuptools import setup, find_packages
-from codecs import open
 from os import path
 
 here = path.abspath(path.dirname(__file__))
 f = path.join(here, 'README.md')
 
-try:
-    from pypandoc import convert
-    long_description = convert(f, 'rst')
-except ImportError:
-    print(
-        "pypandoc module not found, could not convert Markdown to RST")
-    long_description = open(f, 'r').read()
-
 setup(
     name='pymobiledevice',
-    version='0.0.2',
+    version='0.0.3',
     description="Interface with iOS devices",
-    long_description=long_description,
     url='https://github.com/appknox/pymobiledevice',
     author='dhilipsiva',
     author_email='dhilipsiva@gmail.com',
