@@ -23,9 +23,9 @@
 #
 
 
-from .lockdown import LockdownClient
+from pymobiledevice.lockdown import LockdownClient
 from pprint import pprint
-from .afc import AFCClient, AFCShell
+from pymobiledevice.afc import AFCClient, AFCShell
 from optparse import OptionParser
 import os
 import warnings

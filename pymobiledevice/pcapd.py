@@ -26,7 +26,7 @@ import struct
 import time
 import sys
 from tempfile import mkstemp
-from .lockdown import LockdownClient
+from pymobiledevice.lockdown import LockdownClient
 from optparse import OptionParser
 
 """
@@ -54,10 +54,10 @@ class PcapOut(object):
     def __init__(self, pipename=r'test.pcap'):
         self.pipe = open(pipename,'wb')
         self.pipe.write(struct.pack("<LHHLLLL", 0xa1b2c3d4, 2, 4, 0, 0, 65535, LINKTYPE_ETHERNET))
-    
+
     def __del__(self):
         self.pipe.close()
-        
+
     def writePacket(self, packet):
         t = time.time()
         #TODO check milisecond conversion
@@ -86,7 +86,7 @@ class Win32Pipe(object):
         return errCode == 0
 
 if __name__ == "__main__":
-    
+
     if sys.platform == "darwin":
             print("Why not use rvictl ?")
 
@@ -109,7 +109,7 @@ if __name__ == "__main__":
 
     lockdown = LockdownClient()
     pcap = lockdown.startService("com.apple.pcapd")
-    
+
     while True:
         d = pcap.recvPlist()
         if not d:
@@ -117,12 +117,12 @@ if __name__ == "__main__":
         data = d.data
         hdrsize, xxx, packet_size = struct.unpack(">LBL", data[:9])
         flags1, flags2, offset_to_ip_data, zero = struct.unpack(">LLLL", data[9:0x19])
-        
+
         assert hdrsize >= 0x19
         interfacetype= data[0x19:hdrsize].strip("\x00")
         t = time.time()
         print(interfacetype, packet_size, t)
-        
+
         packet = data[hdrsize:]
         assert packet_size == len(packet)
 
@@ -131,4 +131,4 @@ if __name__ == "__main__":
             packet = "\xBE\xEF" * 6 + "\x08\x00" + packet
         if not output.writePacket(packet):
             break
-        
+

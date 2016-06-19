@@ -23,10 +23,10 @@
 #
 
 
-from .lockdown import LockdownClient
+from pymobiledevice.lockdown import LockdownClient
 from datetime import datetime
-from .util import getHomePath
-from .util import hexdump
+from pymobiledevice.util import getHomePath
+from pymobiledevice.util import hexdump
 from sys import exit
 from optparse import OptionParser
 
@@ -44,13 +44,13 @@ class Syslog(object):
         else:
             sys.exit(1)
 
-                  
+
 
     def watch(self,procName=None,logFile=None):
-                
+
         while True:
             d = self.c.recv(4096)
-            
+
             if not d:
                 break
 
@@ -59,7 +59,7 @@ class Syslog(object):
                 if len(d.split(" ")) > 4 and  not procFilter.search(d):
                     continue
 
-            print(d.strip("\n\x00\x00"))
+            print(d.strip(b"\n\x00\x00"))
 
             if logFile:
                 with open(logFile, 'a') as f:
@@ -72,7 +72,7 @@ if __name__ == "__main__":
     parser.add_option("-o", "--logfile", dest="logFile", default=False,
                   help="Write Logs into specified file", type="string")
     (options, args) = parser.parse_args()
-    
+
     try:
         while True:
             try:
@@ -84,6 +84,6 @@ if __name__ == "__main__":
             else:
                 pass
 
-    
-    except (KeyboardInterrupt, SystemExit): 
+
+    except (KeyboardInterrupt, SystemExit):
         exit()

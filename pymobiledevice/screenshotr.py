@@ -23,7 +23,7 @@
 #
 
 
-from .lockdown import LockdownClient
+from pymobiledevice.lockdown import LockdownClient
 from pprint import pprint
 import plistlib
 from time import gmtime, strftime
@@ -39,8 +39,8 @@ class screenshotr(object):
             self.lockdown = LockdownClient()
         #Starting Screenshot service
         self.service = self.lockdown.startService(serviceName)
-        
-        #hand check 
+
+        #hand check
         DLMessageVersionExchange = self.service.recvPlist()
         #assert len(DLMessageVersionExchange) == 2
         version_major = DLMessageVersionExchange[1]
@@ -53,12 +53,12 @@ class screenshotr(object):
     def take_screenshot(self):
         self.service.sendPlist(['DLMessageProcessMessage', {'MessageType': 'ScreenShotRequest'}])
         res = self.service.recvPlist()
-        
+
         assert len(res) == 2
         assert res[0] == "DLMessageProcessMessage"
 
         if res[1].get('MessageType') == 'ScreenShotReply':
-            data = res[1]['ScreenShotData'].data 
+            data = res[1]['ScreenShotData'].data
             return data
         return None
 
@@ -72,12 +72,12 @@ if __name__ == '__main__':
     if options.outDir:
         outPath = options.outDir
 
-    screenshotr = screenshotr()    
+    screenshotr = screenshotr()
     data = screenshotr.take_screenshot()
     if data:
-        filename = strftime('screenshot-%Y-%m-%d-%H-%M-%S.tif',gmtime()) 
+        filename = strftime('screenshot-%Y-%m-%d-%H-%M-%S.tif',gmtime())
         outPath = os.path.join(outPath, filename)
         print('Saving Screenshot at %s' % outPath)
         o = open(outPath,'wb')
         o.write(data)
- 
+

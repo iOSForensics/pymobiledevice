@@ -23,8 +23,8 @@
 #
 
 
-from .usbmux import usbmux
-from .util.bplist import BPlistReader
+from ak_vendor import usbmux
+from pymobiledevice.util.bplist import BPlistReader
 import plistlib
 import ssl
 import struct
@@ -80,7 +80,7 @@ class PlistService(object):
 
 
     def recv_exact(self, l):
-        data = ""
+        data = b""
         while l > 0:
             d = self.recv(l)
             if not d or len(d) == 0:
@@ -103,17 +103,17 @@ class PlistService(object):
         payload = self.recv_raw()
         if not payload:
             return
-        if payload.startswith("bplist00"):
+        if payload.startswith(b"bplist00"):
             return BPlistReader(payload).parse()
-        elif payload.startswith("<?xml"):
+        elif payload.startswith(b"<?xml"):
             #HAX lockdown HardwarePlatform with null bytes
             payload = sub('[^\w<>\/ \-_0-9\"\'\\=\.\?\!\+]+','', payload.decode('utf-8')).encode('utf-8')
-            return plistlib.readPlistFromString(payload)
+            return plistlib.loads(payload)
         else:
             raise Exception("recvPlist invalid data : %s" % payload[:100].encode("hex"))
 
     def sendPlist(self, d):
-        payload = plistlib.writePlistToString(d)
+        payload = plistlib.dumps(d)
         l = struct.pack(">L", len(payload))
         return self.send(l + payload)
 

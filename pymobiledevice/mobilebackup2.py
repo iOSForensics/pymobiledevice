@@ -28,13 +28,13 @@ import hashlib
 import datetime
 from optparse import OptionParser
 from pprint import pprint
-from .util import write_file, hexdump
+from pymobiledevice.util import write_file, hexdump
 from biplist import writePlist, readPlist, Data
 from struct import unpack, pack
 from time import mktime, gmtime, sleep, time
 
-from .lockdown import LockdownClient
-from .mobilebackup import MobileBackup
+from pymobiledevice.lockdown import LockdownClient
+from pymobiledevice.mobilebackup import MobileBackup
 
 CODE_SUCCESS = 0x00
 CODE_ERROR_LOCAL =  0x06

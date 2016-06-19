@@ -1,7 +1,7 @@
 import glob
 import plistlib
 import os
-from .bplist import BPlistReader
+from pymobiledevice.util.bplist import BPlistReader
 import pickle
 import gzip
 from optparse import *

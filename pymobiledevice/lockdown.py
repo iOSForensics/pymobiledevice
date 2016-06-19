@@ -29,11 +29,11 @@ import uuid
 import platform
 import time
 
-from .plist_service import PlistService
+from pymobiledevice.plist_service import PlistService
 from pprint import pprint
-from .ca import ca_do_everything
-from .util import write_file, readHomeFile, writeHomeFile
-from .usbmux import usbmux
+from pymobiledevice.ca import ca_do_everything
+from pymobiledevice.util import write_file, readHomeFile, writeHomeFile
+from ak_vendor import usbmux
 
 
 
@@ -153,7 +153,7 @@ class LockdownClient(object):
             print("Looking for pymobiledevice pairing record")
             record = readHomeFile(HOMEFOLDER, "%s.plist" % self.identifier)
             if record:
-                pair_record = plistlib.readPlistFromString(record)
+                pair_record = plistlib.loads(record)
                 print("Found pymobiledevice pairing record for device %s" % self.udid)
                 certPem = pair_record["HostCertificate"].data
                 privateKeyPem = pair_record["HostPrivateKey"].data
@@ -178,7 +178,8 @@ class LockdownClient(object):
         self.SessionID = startsession.get("SessionID")
         if startsession.get("EnableSessionSSL"):
             sslfile = self.identifier + "_ssl.txt"
-            sslfile = writeHomeFile(HOMEFOLDER, sslfile, certPem + "\n" + privateKeyPem)
+            # print(HOMEFOLDER, sslfile, certPem, "\n", privateKeyPem)
+            sslfile = writeHomeFile(HOMEFOLDER, sslfile, certPem + b"\n" + privateKeyPem)
             self.c.ssl_start(sslfile, sslfile)
 
         self.paired = True
@@ -209,7 +210,7 @@ class LockdownClient(object):
         if pair and  pair.get("Result") == "Success" or "EscrowBag" in pair:
             pair_record["HostPrivateKey"] = plistlib.Data(privateKeyPem)
             pair_record["EscrowBag"] = pair.get("EscrowBag")
-            writeHomeFile(HOMEFOLDER, "%s.plist" % self.identifier, plistlib.writePlistToString(pair_record))
+            writeHomeFile(HOMEFOLDER, "%s.plist" % self.identifier, plistlib.dumps(pair_record))
             self.paired = True
             return True
 
@@ -288,7 +289,7 @@ class LockdownClient(object):
 if __name__ == "__main__":
     l = LockdownClient()
     if l:
-        n = writeHomeFile(HOMEFOLDER, "%s_infos.plist" % l.udid, plistlib.writePlistToString(l.allValues))
+        n = writeHomeFile(HOMEFOLDER, "%s_infos.plist" % l.udid, plistlib.dumps(l.allValues))
         print("Wrote infos to %s" % n)
     else:
         print("Unable to connect to device")
