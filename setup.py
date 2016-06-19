@@ -29,7 +29,7 @@ except ImportError:
     long_description = open(f, 'r').read()
 
 setup(
-    name='pymobile-device',
+    name='pymobiledevice',
     version='0.0.1',
     description="Interface with iOS devices",
     long_description=long_description,
@@ -51,8 +51,9 @@ setup(
     py_modules=['pymobiledevice'],
     entry_points='',
     install_requires=[
-        'ak_vendor',
-        'ak_construct',
+        'ak-vendor',
+        'ak-construct',
+        'ak-m2crypto',
     ],
     extras_require={
         'dev': [''],
