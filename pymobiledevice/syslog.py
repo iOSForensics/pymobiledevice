@@ -32,7 +32,9 @@ from optparse import OptionParser
 
 import re
 
+
 class Syslog(object):
+
     def __init__(self, lockdown=None):
         if lockdown:
             self.lockdown = lockdown
@@ -44,9 +46,7 @@ class Syslog(object):
         else:
             sys.exit(1)
 
-
-
-    def watch(self,procName=None,logFile=None):
+    def watch(self, procName=None, logFile=None):
 
         while True:
             d = self.c.recv(4096)
@@ -55,8 +55,8 @@ class Syslog(object):
                 break
 
             if procName:
-                procFilter = re.compile(procName,re.IGNORECASE)
-                if len(d.split(" ")) > 4 and  not procFilter.search(d):
+                procFilter = re.compile(procName, re.IGNORECASE)
+                if len(d.split(" ")) > 4 and not procFilter.search(d):
                     continue
 
             print(d.strip(b"\n\x00\x00"))
@@ -68,22 +68,22 @@ class Syslog(object):
 if __name__ == "__main__":
     parser = OptionParser(usage="%prog")
     parser.add_option("-p", "--process", dest="procName", default=False,
-                  help="Show process log only", type="string")
+                      help="Show process log only", type="string")
     parser.add_option("-o", "--logfile", dest="logFile", default=False,
-                  help="Write Logs into specified file", type="string")
+                      help="Write Logs into specified file", type="string")
     (options, args) = parser.parse_args()
 
     try:
         while True:
             try:
                 syslog = Syslog()
-                syslog.watch(procName=options.procName,logFile=options.logFile)
+                syslog.watch(procName=options.procName,
+                             logFile=options.logFile)
             except KeyboardInterrupt:
                 print("KeyboardInterrupt caught")
                 raise
             else:
                 pass
-
 
     except (KeyboardInterrupt, SystemExit):
         exit()

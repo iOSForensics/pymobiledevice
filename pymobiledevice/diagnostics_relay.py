@@ -126,7 +126,9 @@ RegionalBehaviorNoVOIP
 RegionalBehaviorAll
 ApNonce"""
 
+
 class DIAGClient(object):
+
     def __init__(self, lockdown=None, serviceName="com.apple.mobile.diagnostics_relay"):
         if lockdown:
             self.lockdown = lockdown
@@ -136,11 +138,9 @@ class DIAGClient(object):
         self.service = self.lockdown.startService(serviceName)
         self.packet_num = 0
 
-
     def stop_session(self):
         print("Disconecting...")
         self.service.close()
-
 
     def query_mobilegestalt(self, MobileGestalt=MobileGestaltKeys.split("\n")):
         self.service.sendPlist({"Request": "MobileGestalt",
@@ -152,20 +152,16 @@ class DIAGClient(object):
             return d.get("MobileGestalt")
         return None
 
-
     def action(self, action="Shutdown", flags=None):
-        self.service.sendPlist({"Request": action })
+        self.service.sendPlist({"Request": action})
         res = self.service.recvPlist()
         return res.get("Diagnostics")
-
 
     def restart(self):
         return self.action("Restart")
 
-
     def shutdown(self):
         return self.action("Shutdown")
-
 
     def diagnostics(self, diagType="All"):
         self.service.sendPlist({"Request": diagType})
@@ -173,7 +169,6 @@ class DIAGClient(object):
         if res:
             return res.get("Diagnostics")
         return None
-
 
     def ioregistry_entry(self, name=None, ioclass=None):
         d = {}
@@ -191,7 +186,6 @@ class DIAGClient(object):
         if res:
             return res.get("Diagnostics")
         return None
-
 
     def ioregistry_plane(self, plane=""):
         d = {}
@@ -214,13 +208,13 @@ if __name__ == "__main__":
 
     parser = OptionParser(usage="%prog")
     parser.add_option("-c", "--cmd", dest="cmd", default=False,
-                  help="Launch diagnostic command", type="string")
+                      help="Launch diagnostic command", type="string")
     parser.add_option("-m", "--mobilegestalt", dest="mobilegestalt_key", default=False,
-                  help="Request mobilegestalt key", type="string")
+                      help="Request mobilegestalt key", type="string")
     parser.add_option("-i", "--ioclass", dest="ioclass", default=False,
-                  help="Request ioclass", type="string")
+                      help="Request ioclass", type="string")
     parser.add_option("-n", "--ioname", dest="ioname", default=False,
-                  help="Request ionqme", type="string")
+                      help="Request ionqme", type="string")
 
     (options, args) = parser.parse_args()
 
@@ -231,7 +225,7 @@ if __name__ == "__main__":
     elif options.cmd == "IORegistry":
         res = diag.ioregistry_plane()
 
-    elif  options.cmd == "MobileGestalt":
+    elif options.cmd == "MobileGestalt":
 
         if not options.mobilegestalt_key or options.mobilegestalt_key not in MobileGestaltKeys.split("\n"):
             res = diag.query_mobilegestalt()
@@ -244,5 +238,4 @@ if __name__ == "__main__":
 
     if res:
         for k in list(res.keys()):
-            print(" %s \t: %s" % (k,res[k]))
-
+            print(" %s \t: %s" % (k, res[k]))

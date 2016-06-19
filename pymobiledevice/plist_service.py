@@ -31,7 +31,9 @@ import struct
 from pprint import pprint
 from re import sub
 
+
 class PlistService(object):
+
     def __init__(self, port, udid=None):
         self.port = port
         self.connect(udid)
@@ -41,7 +43,7 @@ class PlistService(object):
         mux.process(1.0)
         dev = None
 
-        while not dev and mux.devices :
+        while not dev and mux.devices:
             mux.process(1.0)
             if udid:
                 for d in mux.devices:
@@ -78,7 +80,6 @@ class PlistService(object):
             res = self.recvPlist()
         return res
 
-
     def recv_exact(self, l):
         data = b""
         while l > 0:
@@ -106,11 +107,13 @@ class PlistService(object):
         if payload.startswith(b"bplist00"):
             return BPlistReader(payload).parse()
         elif payload.startswith(b"<?xml"):
-            #HAX lockdown HardwarePlatform with null bytes
-            payload = sub('[^\w<>\/ \-_0-9\"\'\\=\.\?\!\+]+','', payload.decode('utf-8')).encode('utf-8')
+            # HAX lockdown HardwarePlatform with null bytes
+            payload = sub('[^\w<>\/ \-_0-9\"\'\\=\.\?\!\+]+',
+                          '', payload.decode('utf-8')).encode('utf-8')
             return plistlib.loads(payload)
         else:
-            raise Exception("recvPlist invalid data : %s" % payload[:100].encode("hex"))
+            raise Exception("recvPlist invalid data : %s" %
+                            payload[:100].encode("hex"))
 
     def sendPlist(self, d):
         payload = plistlib.dumps(d)
@@ -118,4 +121,5 @@ class PlistService(object):
         return self.send(l + payload)
 
     def ssl_start(self, keyfile, certfile):
-        self.s = ssl.wrap_socket(self.s, keyfile, certfile, ssl_version=ssl.PROTOCOL_TLSv1)
+        self.s = ssl.wrap_socket(
+            self.s, keyfile, certfile, ssl_version=ssl.PROTOCOL_TLSv1)

@@ -29,13 +29,15 @@ from pprint import pprint
 import plistlib
 from pymobiledevice.util import read_file
 
+
 class MobileConfigService(object):
+
     def __init__(self, lockdown):
         self.lockdown = lockdown
         self.service = lockdown.startService("com.apple.mobile.MCInstall")
 
     def GetProfileList(self):
-        self.service.sendPlist({"RequestType":"GetProfileList"})
+        self.service.sendPlist({"RequestType": "GetProfileList"})
         res = self.service.recvPlist()
         if res.get("Status") != "Acknowledged":
             print("GetProfileList error")
@@ -45,7 +47,8 @@ class MobileConfigService(object):
 
     def InstallProfile(self, s):
         #s = plistlib.writePlistToString(payload)
-        self.service.sendPlist({"RequestType":"InstallProfile", "Payload": plistlib.Data(s)})
+        self.service.sendPlist(
+            {"RequestType": "InstallProfile", "Payload": plistlib.Data(s)})
         return self.service.recvPlist()
 
     def RemoveProfile(self, ident):
@@ -58,21 +61,23 @@ class MobileConfigService(object):
         meta = profiles["ProfileMetadata"][ident]
         pprint(meta)
         data = plistlib.dumps({"PayloadType": "Configuration",
-             "PayloadIdentifier": ident,
-             "PayloadUUID": meta["PayloadUUID"],
-             "PayloadVersion": meta["PayloadVersion"]
-         })
-        self.service.sendPlist({"RequestType":"RemoveProfile", "ProfileIdentifier": plistlib.Data(data)})
+                               "PayloadIdentifier": ident,
+                               "PayloadUUID": meta["PayloadUUID"],
+                               "PayloadVersion": meta["PayloadVersion"]
+                               })
+        self.service.sendPlist(
+            {"RequestType": "RemoveProfile", "ProfileIdentifier": plistlib.Data(data)})
         return self.service.recvPlist()
+
 
 def main():
     parser = OptionParser(usage="%prog")
     parser.add_option("-l", "--list", dest="list", action="store_true",
                       default=False, help="List installed profiles")
     parser.add_option("-i", "--install", dest="install", action="store",
-                  metavar="FILE", help="Install profile")
+                      metavar="FILE", help="Install profile")
     parser.add_option("-r", "--remove", dest="remove", action="store",
-                  metavar="IDENTIFIER", help="Remove profile")
+                      metavar="IDENTIFIER", help="Remove profile")
     (options, args) = parser.parse_args()
 
     if not options.list and not options.install and not options.remove:
@@ -90,4 +95,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

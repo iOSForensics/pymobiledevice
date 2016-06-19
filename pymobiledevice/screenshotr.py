@@ -31,27 +31,31 @@ from optparse import OptionParser
 import os
 import plistlib
 
+
 class screenshotr(object):
+
     def __init__(self, lockdown=None, serviceName='com.apple.mobile.screenshotr'):
         if lockdown:
             self.lockdown = lockdown
         else:
             self.lockdown = LockdownClient()
-        #Starting Screenshot service
+        # Starting Screenshot service
         self.service = self.lockdown.startService(serviceName)
 
-        #hand check
+        # hand check
         DLMessageVersionExchange = self.service.recvPlist()
         #assert len(DLMessageVersionExchange) == 2
         version_major = DLMessageVersionExchange[1]
-        self.service.sendPlist(["DLMessageVersionExchange", "DLVersionsOk", version_major ])
+        self.service.sendPlist(
+            ["DLMessageVersionExchange", "DLVersionsOk", version_major])
         DLMessageDeviceReady = self.service.recvPlist()
 
     def stop_session(self):
         self.service.close()
 
     def take_screenshot(self):
-        self.service.sendPlist(['DLMessageProcessMessage', {'MessageType': 'ScreenShotRequest'}])
+        self.service.sendPlist(
+            ['DLMessageProcessMessage', {'MessageType': 'ScreenShotRequest'}])
         res = self.service.recvPlist()
 
         assert len(res) == 2
@@ -65,7 +69,7 @@ class screenshotr(object):
 if __name__ == '__main__':
     parser = OptionParser(usage='%prog')
     parser.add_option('-p', '--path', dest='outDir', default=False,
-            help='Output Directory (default: . )', type='string')
+                      help='Output Directory (default: . )', type='string')
     (options, args) = parser.parse_args()
 
     outPath = '.'
@@ -75,9 +79,8 @@ if __name__ == '__main__':
     screenshotr = screenshotr()
     data = screenshotr.take_screenshot()
     if data:
-        filename = strftime('screenshot-%Y-%m-%d-%H-%M-%S.tif',gmtime())
+        filename = strftime('screenshot-%Y-%m-%d-%H-%M-%S.tif', gmtime())
         outPath = os.path.join(outPath, filename)
         print('Saving Screenshot at %s' % outPath)
-        o = open(outPath,'wb')
+        o = open(outPath, 'wb')
         o.write(data)
-

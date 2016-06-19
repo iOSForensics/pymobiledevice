@@ -30,10 +30,11 @@ from optparse import OptionParser
 
 class HouseArrestClient(AFCClient):
 
-    def __init__(self, lockdown=None,serviceName="com.apple.mobile.house_arrest", service=None):
+    def __init__(self, lockdown=None, serviceName="com.apple.mobile.house_arrest", service=None):
         self.serviceName = serviceName
         self.lockdown = lockdown if lockdown else LockdownClient()
-        self.service = service if service else self.lockdown.startService(self.serviceName)
+        self.service = service if service else self.lockdown.startService(
+            self.serviceName)
 
     def stop_session(self):
         print("Disconecting...")
@@ -47,7 +48,7 @@ class HouseArrestClient(AFCClient):
             print(res["Error"])
             return None
 
-    def shell(self,applicationId,cmd="VendDocuments"):
+    def shell(self, applicationId, cmd="VendDocuments"):
         res = self.send_command(applicationId, cmd="VendDocuments")
         if res:
             AFCShell(client=self.service).cmdloop()
@@ -56,9 +57,9 @@ class HouseArrestClient(AFCClient):
 if __name__ == "__main__":
     parser = OptionParser(usage="%prog -a  applicationId")
     parser.add_option("-a", "--application", dest="applicationId", default=False,
-                  help="Application ID <com.apple.iBooks>", type="string")
+                      help="Application ID <com.apple.iBooks>", type="string")
     parser.add_option("-c", "--command", dest="cmd", default=False,
-                  help="House_Arrest commands: ", type="string")
+                      help="House_Arrest commands: ", type="string")
 
     (options, args) = parser.parse_args()
     h = HouseArrestClient()
@@ -66,10 +67,3 @@ if __name__ == "__main__":
         h.shell(options.applicationId)
     else:
         h.shell(options.applicationId, cmd=options.cmd)
-
-
-
-
-
-
-

@@ -6,22 +6,26 @@ import pickle
 import gzip
 from optparse import *
 
+
 def read_file(filename):
     f = open(filename, "rb")
     data = f.read()
     f.close()
     return data
 
-def write_file(filename,data):
+
+def write_file(filename, data):
     f = open(filename, "wb")
     f.write(data)
     f.close()
+
 
 def makedirs(dirs):
     try:
         os.makedirs(dirs)
     except:
         pass
+
 
 def getHomePath(foldername, filename):
     home = os.path.expanduser('~')
@@ -30,20 +34,24 @@ def getHomePath(foldername, filename):
         makedirs(folderpath)
     return os.path.join(folderpath, filename)
 
+
 def readHomeFile(foldername, filename):
     path = getHomePath(foldername, filename)
     if not os.path.exists(path):
         return None
     return read_file(path)
 
-#return path to HOME+foldername+filename
+# return path to HOME+foldername+filename
+
+
 def writeHomeFile(foldername, filename, data):
     filepath = getHomePath(foldername, filename)
     write_file(filepath, data)
     return filepath
 
+
 def readPlist(filename):
-    f = open(filename,"rb")
+    f = open(filename, "rb")
     d = f.read(16)
     f.close()
     if d.startswith("bplist"):
@@ -51,20 +59,25 @@ def readPlist(filename):
     else:
         return plistlib.readPlist(filename)
 
+
 def parsePlist(s):
     if s.startswith("bplist"):
         return BPlistReader.plistWithString(s)
     else:
         return plistlib.readPlistFromString(s)
 
-#http://stackoverflow.com/questions/1094841/reusable-library-to-get-human-readable-version-of-file-size
+# http://stackoverflow.com/questions/1094841/reusable-library-to-get-human-readable-version-of-file-size
+
+
 def sizeof_fmt(num):
-    for x in ['bytes','KB','MB','GB','TB']:
+    for x in ['bytes', 'KB', 'MB', 'GB', 'TB']:
         if num < 1024.0:
             return "%d%s" % (num, x)
         num /= 1024.0
 
-#http://www.5dollarwhitebox.org/drupal/node/84
+# http://www.5dollarwhitebox.org/drupal/node/84
+
+
 def convert_bytes(bytes):
     bytes = float(bytes)
     if bytes >= 1099511627776:
@@ -83,26 +96,29 @@ def convert_bytes(bytes):
         size = '%.2fb' % bytes
     return size
 
-def xor_strings(a,b):
-    r=""
+
+def xor_strings(a, b):
+    r = ""
     for i in range(len(a)):
-        r+= chr(ord(a[i])^ord(b[i]))
+        r += chr(ord(a[i]) ^ ord(b[i]))
     return r
 
 hex = lambda data: " ".join("%02X" % ord(i) for i in data)
 ascii = lambda data: "".join(c if 31 < ord(c) < 127 else "." for c in data)
 
+
 def hexdump(d):
-    for i in range(0,len(d),16):
-        data = d[i:i+16]
+    for i in range(0, len(d), 16):
+        data = d[i:i + 16]
         print("%08X | %s | %s" % (i, hex(data).ljust(47), ascii(data)))
+
 
 def search_plist(directory, matchDict):
     for p in map(os.path.normpath, glob.glob(directory + "/*.plist")):
         try:
             d = plistlib.readPlist(p)
             ok = True
-            for k,v in list(matchDict.items()):
+            for k, v in list(matchDict.items()):
                 if d.get(k) != v:
                     ok = False
                     break
@@ -112,13 +128,15 @@ def search_plist(directory, matchDict):
         except:
             continue
 
-def save_pickle(filename,data):
-    f = gzip.open(filename,"wb")
+
+def save_pickle(filename, data):
+    f = gzip.open(filename, "wb")
     pickle.dump(data, f, pickle.HIGHEST_PROTOCOL)
     f.close()
 
+
 def load_pickle(filename):
-    f = gzip.open(filename,"rb")
+    f = gzip.open(filename, "rb")
     data = pickle.load(f)
     f.close()
     return data
