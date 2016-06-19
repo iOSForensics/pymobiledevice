@@ -1,10 +1,9 @@
 import glob
 import plistlib
 import os
-from pymobiledevice.util.bplist import BPlistReader
 import pickle
 import gzip
-from optparse import *
+from optparse import Option
 
 
 def read_file(filename):
@@ -52,19 +51,13 @@ def writeHomeFile(foldername, filename, data):
 
 def readPlist(filename):
     f = open(filename, "rb")
-    d = f.read(16)
+    f.read(16)
     f.close()
-    if d.startswith("bplist"):
-        return BPlistReader.plistWithFile(filename)
-    else:
-        return plistlib.readPlist(filename)
+    return plistlib.readPlist(filename)
 
 
 def parsePlist(s):
-    if s.startswith("bplist"):
-        return BPlistReader.plistWithString(s)
-    else:
-        return plistlib.readPlistFromString(s)
+    return plistlib.readPlistFromString(s)
 
 # http://stackoverflow.com/questions/1094841/reusable-library-to-get-human-readable-version-of-file-size
 

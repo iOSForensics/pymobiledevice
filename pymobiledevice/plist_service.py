@@ -24,7 +24,6 @@
 
 
 from ak_vendor import usbmux
-from pymobiledevice.util.bplist import BPlistReader
 import plistlib
 import ssl
 import struct
@@ -104,7 +103,7 @@ class PlistService(object):
         if not payload:
             return
         if payload.startswith(b"bplist00"):
-            return BPlistReader(payload).parse()
+            return plistlib.loads(payload)
         elif payload.startswith(b"<?xml"):
             # HAX lockdown HardwarePlatform with null bytes
             payload = sub('[^\w<>\/ \-_0-9\"\'\\=\.\?\!\+]+',
