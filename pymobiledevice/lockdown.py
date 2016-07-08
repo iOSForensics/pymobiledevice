@@ -23,17 +23,16 @@
 #
 
 import os
-import plistlib
 import sys
 import uuid
+import plistlib
 import platform
-import time
 
-from pymobiledevice.plist_service import PlistService
-from pprint import pprint
+from ak_vendor.usbmux import default_mux as mux
+
 from pymobiledevice.ca import ca_do_everything
-from pymobiledevice.util import write_file, readHomeFile, writeHomeFile
-from ak_vendor import usbmux
+from pymobiledevice.plist_service import PlistService
+from pymobiledevice.util import readHomeFile, writeHomeFile
 
 
 class NotTrustedError(Exception):
@@ -68,7 +67,6 @@ MAXTRIES = 20
 
 
 def list_devices():
-    mux = usbmux.USBMux()
     mux.process(1)
     return [d.serial for d in mux.devices]
 
@@ -121,8 +119,10 @@ class LockdownClient(object):
 
     def stop_session(self):
         if self.SessionID and self.c:
-            self.c.sendPlist(
-                {"Label": self.label, "Request": "StopSession", "SessionID": self.SessionID})
+            self.c.sendPlist({
+                "Label": self.label,
+                "Request": "StopSession",
+                "SessionID": self.SessionID})
             self.SessionID = None
             res = self.c.recvPlist()
             if not res or res.get("Result") != "Success":
@@ -236,7 +236,10 @@ class LockdownClient(object):
 
     def getValue(self, domain=None, key=None):
 
-        if(isinstance(key, str) and hasattr(self, 'record') and hasattr(self.record, key)):
+        if(
+                isinstance(key, str) and
+                hasattr(self, 'record')and
+                hasattr(self.record, key)):
             return self.record[key]
 
         req = {"Request": "GetValue", "Label": self.label}
@@ -288,8 +291,9 @@ class LockdownClient(object):
         if (not escrowBag):
             escrowBag = self.record['EscrowBag']
 
-        self.c.sendPlist({"Label": self.label, "Request": "StartService",
-                          "Service": name, 'EscrowBag': plistlib.Data(escrowBag)})
+        self.c.sendPlist({
+            "Label": self.label, "Request": "StartService", "Service": name,
+            'EscrowBag': plistlib.Data(escrowBag)})
         StartService = self.c.recvPlist()
         if not StartService or StartService.get("Error"):
             raise StartServiceError(StartService.get("Error"))

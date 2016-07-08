@@ -23,11 +23,11 @@
 #
 
 
-from ak_vendor import usbmux
-import plistlib
 import ssl
 import struct
+import plistlib
 from re import sub
+from ak_vendor.usbmux import default_mux as mux
 
 
 class PlistService(object):
@@ -37,7 +37,6 @@ class PlistService(object):
         self.connect(udid)
 
     def connect(self, udid=None):
-        mux = usbmux.USBMux()
         mux.process(1.0)
         dev = None
 
