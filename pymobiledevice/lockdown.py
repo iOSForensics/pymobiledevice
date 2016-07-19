@@ -84,7 +84,7 @@ class LockdownClient(object):
 
         assert self.queryType() == "com.apple.mobile.lockdown"
 
-        self.udid = self.getValue("", "UniqueDeviceID")
+        self.udid = udid
         self.allValues = self.getValue()
         self.UniqueChipID = self.allValues.get("UniqueChipID")
         self.DevicePublicKey = self.getValue("", "DevicePublicKey")
@@ -281,7 +281,7 @@ class LockdownClient(object):
         StartService = self.c.recvPlist()
         if not StartService or StartService.get("Error"):
             raise StartServiceError(StartService.get("Error"))
-        return PlistService(StartService.get("Port"))
+        return PlistService(StartService.get("Port"), self.udid)
 
     def startServiceWithEscrowBag(self, name, escrowBag=None):
         if not self.paired:
@@ -297,7 +297,7 @@ class LockdownClient(object):
         StartService = self.c.recvPlist()
         if not StartService or StartService.get("Error"):
             raise StartServiceError(StartService.get("Error"))
-        return PlistService(StartService.get("Port"))
+        return PlistService(StartService.get("Port"), self.udid)
 
 
 if __name__ == "__main__":
