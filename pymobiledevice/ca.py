@@ -10,7 +10,7 @@ Copyright (c) 2004 Open Source Applications Foundation.
 Author: Heikki Toivonen
 """
 
-from M2Crypto import RSA, X509, EVP, m2, Rand, Err, BIO
+from M2Crypto import RSA, X509, EVP, m2, BIO
 from M2Crypto.RSA import load_pub_key_bio
 import base64
 
@@ -18,25 +18,28 @@ import base64
 def der_length(length):
     # DER encoding of a length
     if length < 128:
-        return chr(length)
+        ret_val = chr(length)
+        return ret_val.encode()
     prefix = 0x80
     result = ''
     while length > 0:
         result = chr(length & 0xff) + result
         length >>= 8
         prefix += 1
-    return chr(prefix) + result
+    ret_val = chr(prefix) + result
+    return ret_val.encode()
 
 
 def convertPKCS1toPKCS8pubKey(data):
     # https://mail.python.org/pipermail/python-list/2013-January/638754.html
-    res = data.split('\n')
-    res = '\0' + base64.decodestring("".join(res[1:-2]))
-    res = '\x30\x0d\x06\x09\x2a\x86\x48\x86\xf7\x0d\x01\x01\x01\x05\x00\x03' + \
+    res = data.split(b'\n')
+    res = b'\0' + base64.decodestring(b"".join(res[1:-2]))
+    res = \
+        b'\x30\x0d\x06\x09\x2a\x86\x48\x86\xf7\x0d\x01\x01\x01\x05\x00\x03' + \
         der_length(len(res)) + res
-    res = '\x30' + der_length(len(res)) + res
-    res = '-----BEGIN PUBLIC KEY-----\n' + \
-        base64.encodestring(res) + '-----END PUBLIC KEY-----'
+    res = b'\x30' + der_length(len(res)) + res
+    res = b'-----BEGIN PUBLIC KEY-----\n' + \
+        base64.encodestring(res) + b'-----END PUBLIC KEY-----'
     return res
 
 # XXX Do I actually need more keys?
@@ -69,13 +72,13 @@ def makeRequest(pkey, cn):
     assert(extstack[1].get_name() == 'nsComment')
 
     req.add_extensions(extstack)
-    #req.sign(pkey, 'sha1')
+    # req.sign(pkey, 'sha1')
     return req
 
 
 def makeCert(req, caPkey):
     pkey = req.get_pubkey()
-    #woop = makePKey(generateRSAKey())
+    # woop = makePKey(generateRSAKey())
     # if not req.verify(woop.pkey):
     if not req.verify(pkey):
         # XXX What error object should I use?

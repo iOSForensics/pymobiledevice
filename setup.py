@@ -21,7 +21,7 @@ f = path.join(here, 'README.md')
 
 setup(
     name='pymobiledevice',
-    version='0.1.1',
+    version='0.1.2',
     description="Interface with iOS devices",
     url='https://github.com/appknox/pymobiledevice',
     author='dhilipsiva',
