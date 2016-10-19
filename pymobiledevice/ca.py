@@ -7,43 +7,47 @@ WARNING: This sample only demonstrates how to use the objects and methods,
          not how to create a safe and correct certificate.
 
 Copyright (c) 2004 Open Source Applications Foundation.
-Author: Heikki Toivonen
+Authors: Heikki Toivonen
+         Mathieu RENARD
 """
 
 from M2Crypto import RSA, X509, EVP, m2, BIO
 from M2Crypto.RSA import load_pub_key_bio
+from pyasn1.type import univ
+from pyasn1.codec.der import encoder as der_encoder
+from pyasn1.codec.der import decoder as der_decoder
+import struct
 import base64
+from pprint import *
 
 
-def der_length(length):
-    # DER encoding of a length
-    if length < 128:
-        ret_val = chr(length)
-        return ret_val.encode()
-    prefix = 0x80
-    result = ''
-    while length > 0:
-        result = chr(length & 0xff) + result
-        length >>= 8
-        prefix += 1
-    ret_val = chr(prefix) + result
-    return ret_val.encode()
-
-
-def convertPKCS1toPKCS8pubKey(data):
-    # https://mail.python.org/pipermail/python-list/2013-January/638754.html
-    res = data.split(b'\n')
-    res = b'\0' + base64.decodestring(b"".join(res[1:-2]))
-    res = \
-        b'\x30\x0d\x06\x09\x2a\x86\x48\x86\xf7\x0d\x01\x01\x01\x05\x00\x03' + \
-        der_length(len(res)) + res
-    res = b'\x30' + der_length(len(res)) + res
-    res = b'-----BEGIN PUBLIC KEY-----\n' + \
-        base64.encodestring(res) + b'-----END PUBLIC KEY-----'
+def convertPKCS1toPKCS8pubKey(bitsdata):
+    pubkey_pkcs1_b64 = b''.join(bitsdata.split(b'\n')[1:-2])
+    pubkey_pkcs1, restOfInput = der_decoder.decode(
+        base64.b64decode(pubkey_pkcs1_b64))
+    bitstring = univ.Sequence()
+    bitstring.setComponentByPosition(0, univ.Integer(pubkey_pkcs1[0]))
+    bitstring.setComponentByPosition(1, univ.Integer(pubkey_pkcs1[1]))
+    bitstring = der_encoder.encode(bitstring)
+    try:
+        bitstring = ''.join(
+            [('00000000' + bin(ord(x))[2:])[-8:] for x in list(bitstring)])
+    except:
+        bitstring = ''.join(
+            [('00000000' + bin(x)[2:])[-8:] for x in list(bitstring)])
+    bitstring = univ.BitString("'%s'B" % bitstring)
+    pubkeyid = univ.Sequence()
+    pubkeyid.setComponentByPosition(
+        0, univ.ObjectIdentifier('1.2.840.113549.1.1.1'))  # OID rsaEncryption
+    pubkeyid.setComponentByPosition(1, univ.Null(''))
+    pubkey_seq = univ.Sequence()
+    pubkey_seq.setComponentByPosition(0, pubkeyid)
+    pubkey_seq.setComponentByPosition(1, bitstring)
+    base64.MAXBINSIZE = (64 // 4) * 3
+    res = b"-----BEGIN PUBLIC KEY-----\n"
+    res += base64.encodestring(der_encoder.encode(pubkey_seq))
+    res += b"-----END PUBLIC KEY-----\n"
     return res
-
-# XXX Do I actually need more keys?
-# XXX Check return values from functions
 
 
 def generateRSAKey():
@@ -144,7 +148,6 @@ if __name__ == '__main__':
     pkey = makePKey(rsa)
     print(pkey.as_pem(None))
     req = makeRequest(pkey, "The Issuer Monkey")
-    # print req.as_text()
     cert = makeCert(req, pkey)
     print(cert.as_text())
     cert.save_pem('my_ca_cert.pem')
