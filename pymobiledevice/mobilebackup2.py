@@ -449,7 +449,7 @@ class MobileBackup2(MobileBackup):
         self.logger.info("Backup mode: %s", "Full backup" if fullBackup else "Incremental backup")
         self.create_info_plist()
         options = {"ForceFullBackup": fullBackup}
-        self.mobilebackup2_send_request("Backup", self.udid, options)
+        self.mobilebackup2_send_request("Backup", self.udid, self.udid, options)
         self.work_loop()
 
 
