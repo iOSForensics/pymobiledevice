@@ -31,7 +31,7 @@ import logging
 from optparse import OptionParser
 from pprint import pprint
 from time import mktime, gmtime
-from util import write_file, hexdump
+from pymobiledevice.util import write_file, hexdump
 from biplist import writePlist, readPlist, Data
 from struct import unpack, pack
 from time import mktime, gmtime, sleep, time

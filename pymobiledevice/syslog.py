@@ -29,8 +29,7 @@ from pymobiledevice.lockdown import LockdownClient
 from six import PY3
 from sys import exit
 from datetime import datetime
-from util import getHomePath
-from util import hexdump
+from pymobiledevice.util import getHomePath, hexdump
 from sys import exit
 from optparse import OptionParser
 import time

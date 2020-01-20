@@ -1,6 +1,6 @@
 import os
 import sys
-from util import sizeof_fmt, hexdump
+from pymobiledevice.util import sizeof_fmt, hexdump
 from progressbar import ProgressBar
 from crypto.aes import AESdecryptCBC, AESencryptCBC
 
