@@ -502,7 +502,7 @@ class MobileBackup2(MobileBackup):
         self.work_loop()
 
     def enableCloudBackup(self,options={"CloudBackupState": False}):
-        self.mobilebackup2_send_request("EnableCloudBackup", self.udid, options)
+        self.mobilebackup2_send_request("EnableCloudBackup", self.udid, self.udid, options)
         self.work_loop()
 
     def mobilebackup2_notify_cb(notification, data=None):
