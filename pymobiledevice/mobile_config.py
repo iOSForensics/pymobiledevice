@@ -55,7 +55,7 @@ class MobileConfigService(object):
         profiles = self.GetProfileList()
         if not profiles:
             return
-        if not profiles["ProfileMetadata"].has_key(ident):
+        if not ident in profiles["ProfileMetadata"]:
             self.logger.info("Trying to remove not installed profile %s", ident)
             return
         meta = profiles["ProfileMetadata"][ident]

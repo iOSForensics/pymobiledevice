@@ -208,7 +208,7 @@ class LockdownClient(object):
             ValidatePair = {"Label": self.label, "Request": "ValidatePair", "PairRecord": pair_record}
             self.c.sendPlist(ValidatePair)
             r = self.c.recvPlist()
-            if not r or r.has_key("Error"):
+            if not r or "Error" in r:
                 pair_record = None
                 self.logger.error("ValidatePair fail", ValidatePair)
                 return False
@@ -270,7 +270,7 @@ class LockdownClient(object):
             ValidatePair = {"Label": self.label, "Request": "ValidatePair", "PairRecord": pair_record}
             self.c.sendPlist(ValidatePair)
             r = self.c.recvPlist()
-            if not r or r.has_key("Error"):
+            if not r or "Error" in r:
                 pair_record = None
                 self.logger.error("ValidatePair fail: %s", ValidatePair)
                 return False
@@ -312,7 +312,7 @@ class LockdownClient(object):
         self.c.sendPlist(pair)
         pair = self.c.recvPlist()
 
-        if pair and pair.get("Result") == "Success" or pair.has_key("EscrowBag"):
+        if pair and pair.get("Result") == "Success" or "EscrowBag" in pair:
             pair_record["HostPrivateKey"] = plistlib.Data(privateKeyPem)
             pair_record["EscrowBag"] = pair.get("EscrowBag")
             writeHomeFile(HOMEFOLDER, "%s.plist" % self.identifier, plistlib.writePlistToString(pair_record))
