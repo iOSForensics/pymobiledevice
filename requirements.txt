@@ -4,3 +4,4 @@ pyasn1
 future
 six
 biplist
+termcolor
