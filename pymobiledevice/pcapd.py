@@ -51,12 +51,13 @@ typedef struct pcaprec_hdr_s {
 } pcaprec_hdr_t;
 """
 LINKTYPE_ETHERNET = 1
-LINKTYPE_RAW      = 101
+LINKTYPE_RAW = 101
+
 
 class PcapOut(object):
 
     def __init__(self, pipename=r'test.pcap'):
-        self.pipe = open(pipename,'wb')
+        self.pipe = open(pipename, 'wb')
         self.pipe.write(struct.pack("<LHHLLLL", 0xa1b2c3d4, 2, 4, 0, 0, 65535, LINKTYPE_ETHERNET))
 
     def __del__(self):
@@ -64,62 +65,64 @@ class PcapOut(object):
 
     def writePacket(self, packet):
         t = time.time()
-        #TODO check milisecond conversion
-        pkthdr = struct.pack('<LLLL', int(t), int(t*1000000 % 1000000), len(packet), len(packet))
+        # TODO check milisecond conversion
+        pkthdr = struct.pack('<LLLL', int(t), int(t * 1000000 % 1000000), len(packet), len(packet))
         data = pkthdr + packet
         l = self.pipe.write(data)
         self.pipe.flush()
         return True
 
+
 class Win32Pipe(object):
     def __init__(self, pipename=r'\\.\pipe\wireshark'):
         self.pipe = win32pipe.CreateNamedPipe(pipename,
-                                           win32pipe.PIPE_ACCESS_OUTBOUND,
-                                           win32pipe.PIPE_TYPE_MESSAGE | win32pipe.PIPE_WAIT,
-                                           1, 65536, 65536,
-                                           300,
-                                           None)
+                                              win32pipe.PIPE_ACCESS_OUTBOUND,
+                                              win32pipe.PIPE_TYPE_MESSAGE | win32pipe.PIPE_WAIT,
+                                              1, 65536, 65536,
+                                              300,
+                                              None)
         print("Connect wireshark to %s" % pipename)
         win32pipe.ConnectNamedPipe(self.pipe, None)
         win32file.WriteFile(self.pipe, struct.pack("<LHHLLLL", 0xa1b2c3d4, 2, 4, 0, 0, 65535, LINKTYPE_ETHERNET))
 
     def writePacket(self, packet):
         t = time.time()
-        pkthdr = struct.pack("<LLLL", int(t), int(t*1000000 % 1000000), len(packet), len(packet))
+        pkthdr = struct.pack("<LLLL", int(t), int(t * 1000000 % 1000000), len(packet), len(packet))
         errCode, nBytesWritten = win32file.WriteFile(self.pipe, pkthdr + packet)
         return errCode == 0
 
-if __name__ == "__main__":
 
+if __name__ == "__main__":
     if sys.platform == "darwin":
-            print("Why not use rvictl ?")
+        print("Why not use rvictl ?")
 
     parser = OptionParser(usage="%prog")
     parser.add_option("-u", "--udid",
-                  default=False, action="store", dest="device_udid", metavar="DEVICE_UDID",
-                  help="Device udid")
+                      default=False, action="store", dest="device_udid", metavar="DEVICE_UDID",
+                      help="Device udid")
     parser.add_option("-o", "--output", dest="output", default=False,
-                  help="Output location", type="string")
+                      help="Output location", type="string")
 
     (options, args) = parser.parse_args()
     if sys.platform == "win32":
         import win32pipe, win32file
+
         output = Win32Pipe()
 
     else:
         if options.output:
             path = options.output
         else:
-            _,path = mkstemp(prefix="device_dump_",suffix=".pcap",dir=".")
+            _, path = mkstemp(prefix="device_dump_", suffix=".pcap", dir=".")
         print("Recording data to: %s" % path)
         output = PcapOut(path)
 
     logging.basicConfig(level=logging.INFO)
     lockdown = LockdownClient(options.device_udid)
-    pcap = lockdown.startService("com.apple.pcapd")
+    pcap = lockdown.start_service("com.apple.pcapd")
 
     while True:
-        d = pcap.recvPlist()
+        d = pcap.recv_plist()
         if not d:
             break
         if not PY3:
@@ -129,21 +132,20 @@ if __name__ == "__main__":
 
         assert hdrsize >= 0x19
         if PY3:
-            interfacetype= d[0x19:hdrsize].strip(b"\x00")
+            interfacetype = d[0x19:hdrsize].strip(b"\x00")
         else:
-            interfacetype= d[0x19:hdrsize].strip("\x00")
-            interfacetype = "b'"+"\\x".join("{:02x}".format(ord(c)) for c in interfacetype)+"'"
+            interfacetype = d[0x19:hdrsize].strip("\x00")
+            interfacetype = "b'" + "\\x".join("{:02x}".format(ord(c)) for c in interfacetype) + "'"
         t = time.time()
         print(interfacetype, packet_size, t)
         packet = d[hdrsize:]
         assert packet_size == len(packet)
 
         if offset_to_ip_data == 0:
-            #add fake ethernet header for pdp packets
+            # add fake ethernet header for pdp packets
             if PY3:
                 packet = b"\xBE\xEF" * 6 + b"\x08\x00" + packet
             else:
                 packet = "\xBE\xEF" * 6 + "\x08\x00" + packet
         if not output.writePacket(packet):
             break
-

@@ -38,8 +38,11 @@ if PY3:
     plistlib.writePlistToString = plistlib.dumps
 
 
-class PlistService(object):
+class ConnectionFailedException(Exception):
+    pass
 
+
+class PlistService(object):
     def __init__(self, port, udid=None, logger=None):
         self.logger = logger or logging.getLogger(__name__)
         self.port = port
@@ -50,7 +53,7 @@ class PlistService(object):
         mux.process(1.0)
         dev = None
 
-        while not dev and mux.devices :
+        while not dev and mux.devices:
             mux.process(1.0)
             if udid:
                 for d in mux.devices:
@@ -62,7 +65,7 @@ class PlistService(object):
         try:
             self.s = mux.connect(dev, self.port)
         except:
-            raise Exception("Connexion to device port %d failed" % self.port)
+            raise ConnectionFailedException("Connection to device port %d failed" % self.port)
         return dev.serial
 
     def close(self):
@@ -75,16 +78,15 @@ class PlistService(object):
         try:
             self.s.send(data)
         except:
-            self.logger.error("Sending data to device failled")
+            self.logger.error("Sending data to device failed")
             return -1
         return 0
 
-    def sendRequest(self, data):
+    def send_request(self, data):
         res = None
-        if self.sendPlist(data) >= 0:
-            res = self.recvPlist()
+        if self.send_plist(data) >= 0:
+            res = self.recv_plist()
         return res
-
 
     def recv_exact(self, l):
         data = ""
@@ -109,10 +111,10 @@ class PlistService(object):
         if PY3 and isinstance(data, str):
             data = codecs.encode(data)
         hdr = struct.pack(">L", len(data))
-        msg =  b"".join([hdr,data])
+        msg = b"".join([hdr, data])
         return self.send(msg)
 
-    def recvPlist(self):
+    def recv_plist(self):
         payload = self.recv_raw()
         if not payload:
             return
@@ -128,13 +130,13 @@ class PlistService(object):
                 from pymobiledevice.util.bplist import BPlistReader
                 return BPlistReader(payload).parse()
         elif payload.startswith(xml_header):
-            #HAX lockdown HardwarePlatform with null bytes
-            payload = sub('[^\w<>\/ \-_0-9\"\'\\=\.\?\!\+]+','', payload.decode('utf-8')).encode('utf-8')
+            # HAX lockdown HardwarePlatform with null bytes
+            payload = sub('[^\w<>\/ \-_0-9\"\'\\=\.\?\!\+]+', '', payload.decode('utf-8')).encode('utf-8')
             return plistlib.readPlistFromString(payload)
         else:
             raise Exception("recvPlist invalid data : %s" % payload[:100].encode("hex"))
 
-    def sendPlist(self, d):
+    def send_plist(self, d):
         payload = plistlib.writePlistToString(d)
         l = struct.pack(">L", len(payload))
         return self.send(l + payload)

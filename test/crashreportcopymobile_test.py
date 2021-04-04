@@ -25,7 +25,7 @@ class CrashReportTest(unittest.TestCase):
 
         procname = "QQ"
         lockdown = LockdownClient(udid)
-        self.service = lockdown.startService("com.apple.crashreportcopymobile")
+        self.service = lockdown.start_service("com.apple.crashreportcopymobile")
         client = AFCClient(lockdown,service=self.service)
         afc_shell = AFCShell(client=client)
         remote_crash_path = '/'

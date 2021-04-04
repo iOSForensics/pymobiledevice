@@ -67,7 +67,7 @@ class NPClient(object):
     def __init__(self, lockdown=None, serviceName="com.apple.mobile.notification_proxy", udid=None, logger=None):
         self.logger = logger or logging.getLogger(__name__)
         self.lockdown = lockdown if lockdown else LockdownClient(udid=udid)
-        self.service = self.lockdown.startService(serviceName)
+        self.service = self.lockdown.start_service(serviceName)
 
     def stop_session(self):
         self.logger.info("Disconecting...")
@@ -77,11 +77,11 @@ class NPClient(object):
     def post_notification(self, notification):
         #Sends a notification to the device's notification_proxy.
 
-        self.service.sendPlist({"Command": "PostNotification",
+        self.service.send_plist({"Command": "PostNotification",
                                 "Name": notification})
 
-        self.service.sendPlist({"Command": "Shutdown"})
-        res = self.service.recvPlist()
+        self.service.send_plist({"Command": "Shutdown"})
+        res = self.service.recv_plist()
         #pprint(res)
         if res:
             if res.get("Command") == "ProxyDeath":
@@ -95,14 +95,14 @@ class NPClient(object):
     def observe_notification(self, notification):
         #Tells the device to send a notification on the specified event
         self.logger.info("Observing %s", notification)
-        self.service.sendPlist({"Command": "ObserveNotification",
+        self.service.send_plist({"Command": "ObserveNotification",
                                 "Name": notification})
 
 
     def get_notification(self, notification):
         #Checks if a notification has been sent by the device
 
-        res = self.service.recvPlist()
+        res = self.service.recv_plist()
         if res:
             if res.get("Command") == "RelayNotification":
                 if res.get("Name"):

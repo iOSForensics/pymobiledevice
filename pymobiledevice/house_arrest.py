@@ -36,7 +36,7 @@ class HouseArrestClient(AFCClient):
 
         self.lockdown = lockdown if lockdown else LockdownClient(udid=udid)
         self.serviceName = serviceName
-        self.service = service if service else self.lockdown.startService(self.serviceName)
+        self.service = service if service else self.lockdown.start_service(self.serviceName)
 
     def __init__(self, udid=None,logger=None):
         self.logger = logger or logging.getLogger(__name__)
@@ -49,8 +49,8 @@ class HouseArrestClient(AFCClient):
         self.service.close()
 
     def send_command(self, applicationId, cmd="VendContainer"):
-        self.service.sendPlist({"Command": cmd, "Identifier": applicationId})
-        res = self.service.recvPlist()
+        self.service.send_plist({"Command": cmd, "Identifier": applicationId})
+        res = self.service.recv_plist()
         if res.get("Error"):
             self.logger.error("%s : %s", applicationId, res.get("Error"))
             return False
