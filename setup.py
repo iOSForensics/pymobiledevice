@@ -2,14 +2,15 @@
 '''package script
 '''
 
-
 import os
 import platform
 import sys
 from pymobiledevice import version as pm
 from setuptools import setup, find_packages
+
 BASE_DIR = os.path.realpath(os.path.dirname(__file__))
 VERSION = pm.VERSION
+
 
 def replace_version_py(version):
     content = """# -*- coding: utf-8 -*-
@@ -19,7 +20,7 @@ VERSION = '%(version)s'
 """
     version_py = os.path.join(BASE_DIR, 'pymobiledevice', 'version.py')
     with open(version_py, 'w') as fd:
-        fd.write(content % {'version':version})
+        fd.write(content % {'version': version})
 
 
 def generate_version():
@@ -50,12 +51,11 @@ def parse_requirements():
 
 
 def get_description():
-    with open(os.path.join(BASE_DIR, "README.md"), "r", encoding="utf-8") as fh:
+    with open(os.path.join(BASE_DIR, "README.md"), "r") as fh:
         return fh.read()
 
 
 if __name__ == "__main__":
-
     setup(
         version=generate_version(),
         name="pymobiledevice",
@@ -64,7 +64,7 @@ if __name__ == "__main__":
         long_description_content_type='text/markdown',
         cmdclass={},
         packages=find_packages(),
-        package_data={'':['*.txt', '*.TXT'], },
+        package_data={'': ['*.txt', '*.TXT'], },
         data_files=[(".", ["requirements.txt"])],
         author="Mathieu Renard <dark[-at-]gotohack.org>",
         license="Copyright(c)2010-2019 Mathieu Renard All Rights Reserved. ",
@@ -77,6 +77,6 @@ if __name__ == "__main__":
         ],
         url="https://github.com/iOSForensics/pymobiledevice",
         project_urls={
-            "pymobiledevice Documentation":"https://github.com/iOSForensics/pymobiledevice"
+            "pymobiledevice Documentation": "https://github.com/iOSForensics/pymobiledevice"
         },
     )
