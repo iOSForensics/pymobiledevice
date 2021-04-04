@@ -22,26 +22,28 @@
 #
 #
 
-import re
-import logging
-
-from pymobiledevice.lockdown import LockdownClient
+from optparse import OptionParser
+from datetime import datetime
 from six import PY3
 from sys import exit
-from datetime import datetime
-from util import getHomePath
-from util import hexdump
-from sys import exit
-from optparse import OptionParser
+import logging
 import time
+import re
 
+from termcolor import colored
+
+from pymobiledevice.lockdown import LockdownClient
+
+CHUNK_SIZE = 4096
 TIME_FORMAT = '%H:%M:%S'
+SYSLOG_LINE_SPLITTER = '\n\x00'
 
 
 class Syslog(object):
-    '''
+    """
     View system logs
-    '''
+    """
+
     def __init__(self, lockdown=None, udid=None, logger=None):
         self.logger = logger or logging.getLogger(__name__)
         self.lockdown = lockdown if lockdown else LockdownClient(udid=udid)
@@ -51,72 +53,112 @@ class Syslog(object):
         else:
             exit(1)
 
-    def watch(self, watchtime=None, logFile=None, procName=None):
-        '''View log
+    def watch(self, watchtime=None, log_file=None, proc_name=None, use_colors=True):
+        """
+        View log
         :param watchtime: time (seconds)
         :type watchtime: int
-        :param logFile: full path to the log file
-        :type logFile: str
-        :param procName: process name
-        :type proName: str
-        '''
+        :param log_file: full path to the log file
+        :type log_file: str
+        :param proc_name: process name
+        :type proc_name: str
+        """
+        syslog_exp = re.compile(
+            r'(?P<month>\w+)\s+(?P<day>\d+)\s+(?P<hour>\d{2}):(?P<minute>\d{2}):(?P<second>\d{2}) '
+            r'(?P<device_name>.+?) (?P<process>.+?)(\((?P<image_name>.+?)\))?\[(?P<pid>\d+)\] '
+            r'<(?P<level>\w+)>: (?P<message>.+)')
         begin = time.strftime(TIME_FORMAT)
+        buf = ''
+
+        start_time = time.time()
+
         while True:
-            d = self.c.recv(4096)
+            # read in chunks till we have at least one syslog line
+            chunk = self.c.recv(CHUNK_SIZE)
             if PY3:
-                d = d.decode('utf-8')
-            if procName:
-                procFilter = re.compile(procName,re.IGNORECASE)
-                if len(d.split(" ")) > 4 and not procFilter.search(d):
-                    continue
-            s =  d.strip("\n\x00\x00")
-            #self.logger.info(s)
-            print(s)
-            if logFile:
-                with open(logFile, 'a') as f:
-                    f.write(d.replace("\x00", ""))
-            if watchtime:
-                now = self.time_match(s[7:15])
-                if now:
-                    time_spend = self.time_caculate(str(begin), now)
-                    if time_spend > watchtime :
-                        break
+                chunk = chunk.decode('utf-8')
 
+            buf += chunk
 
-    def time_match(self, str_time):
-        '''
-        Determine if the time format matches
-        '''
-        pattern = re.compile(r'\d{2}:\d{2}:\d{2}')
-        match = pattern.match(str_time)
-        if match:
-            return str_time
-        else:
-            return False
+            # SYSLOG_LINE_SPLITTER is used to split each syslog line
+            if SYSLOG_LINE_SPLITTER in buf:
+                lines = buf.split(SYSLOG_LINE_SPLITTER)
 
-    def time_caculate(self, a, b):
-        '''
-        Calculate the time difference between two strings
-        '''
-        time_a = int(a[6:8])+60*int(a[3:5])+3600*int(a[0:2])
-        time_b = int(b[6:8])+60*int(b[3:5])+3600*int(b[0:2])
-        time_a = int(a[6:8])+60*int(a[3:5])+3600*int(a[0:2])
-        time_b = int(b[6:8])+60*int(b[3:5])+3600*int(b[0:2])
-        return time_b - time_a
+                # handle partial last lines
+                if not buf.endswith(SYSLOG_LINE_SPLITTER):
+                    buf = lines[-1]
+                    lines = lines[:-1]
+
+                for line in lines:
+                    if len(line) == 0:
+                        continue
+
+                    syslog_entry = syslog_exp.match(line)
+                    if syslog_entry is None:
+                        raise Exception('failed to parse log line: {}'.format(line))
+
+                    syslog_entry = syslog_entry.groupdict()
+
+                    if proc_name:
+                        if syslog_entry['process'] != proc_name:
+                            continue
+
+                    # use real year since the syslog entry doesn't store that information
+                    timestamp = datetime.strptime('{year} {month} {day} {hour}:{minute}:{second}'.format(
+                        year=datetime.now().year, month=syslog_entry['month'], day=syslog_entry['day'],
+                        hour=syslog_entry['hour'], minute=syslog_entry['minute'], second=syslog_entry['second']
+                    ), '%Y %b %d %H:%M:%S')
+
+                    timestamp = str(timestamp)
+                    process = syslog_entry['process']
+                    image_name = ''
+                    if syslog_entry['image_name'] is not None:
+                        image_name = '({})'.format(syslog_entry['image_name'])
+                    pid = syslog_entry['pid']
+                    level = syslog_entry['level']
+                    message = syslog_entry['message']
+
+                    if use_colors:
+                        timestamp = colored(str(timestamp), 'green')
+                        process = colored(process, 'magenta')
+                        if len(image_name) > 0:
+                            image_name = colored(image_name, 'magenta')
+                        pid = colored(syslog_entry['pid'], 'cyan')
+                        level = colored(syslog_entry['level'], {
+                            'Notice': 'white',
+                            'Error': 'red',
+                            'Fault': 'red',
+                            'Warning': 'yellow',
+                        }[level])
+
+                        message = colored(syslog_entry['message'], 'white')
+
+                    print('{timestamp} {process}{image_name}[{pid}] <{level}>: {message}'.format(
+                        timestamp=timestamp, process=process, image_name=image_name, pid=pid, level=level,
+                        message=message,
+                    ))
+
+                    if log_file:
+                        with open(log_file, 'a') as f:
+                            f.write(line + '\n')
+
+                    if watchtime:
+                        if time.time() - start_time > watchtime:
+                            return
 
 
 if __name__ == "__main__":
     parser = OptionParser(usage="%prog")
     parser.add_option("-u", "--udid",
-                  default=False, action="store", dest="device_udid", metavar="DEVICE_UDID",
-                  help="Device udid")
+                      default=False, action="store", dest="device_udid", metavar="DEVICE_UDID",
+                      help="Device udid")
     parser.add_option("-p", "--process", dest="procName", default=False,
-                  help="Show process log only", type="string")
+                      help="Show process log only", type="string")
     parser.add_option("-o", "--logfile", dest="logFile", default=False,
-                  help="Write Logs into specified file", type="string")
+                      help="Write Logs into specified file", type="string")
     parser.add_option("-w", "--watch-time",
-                  default=False, action="store", dest="watchtime", metavar="WATCH_TIME",
-                  help="watchtime")
+                      default=False, action="store", dest="watchtime", metavar="WATCH_TIME",
+                      help="watchtime")
     (options, args) = parser.parse_args()
 
     try:
@@ -124,13 +166,11 @@ if __name__ == "__main__":
             logging.basicConfig(level=logging.INFO)
             lckdn = LockdownClient(options.device_udid)
             syslog = Syslog(lockdown=lckdn)
-            syslog.watch(watchtime=int(options.watchtime), procName=options.procName,logFile=options.logFile)
+            syslog.watch(watchtime=int(options.watchtime), proc_name=options.procName, log_file=options.logFile)
         except KeyboardInterrupt:
             print("KeyboardInterrupt caught")
             raise
         else:
             pass
-
-
     except (KeyboardInterrupt, SystemExit):
         exit()
