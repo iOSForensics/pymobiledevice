@@ -89,8 +89,7 @@ class Win32Pipe(object):
         errCode, nBytesWritten = win32file.WriteFile(self.pipe, pkthdr + packet)
         return errCode == 0
 
-if __name__ == "__main__":
-
+def main():
     if sys.platform == "darwin":
             print("Why not use rvictl ?")
 
@@ -147,3 +146,7 @@ if __name__ == "__main__":
         if not output.writePacket(packet):
             break
 
+
+
+if __name__ == "__main__":
+    main()

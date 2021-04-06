@@ -61,7 +61,7 @@ class screenshotr(object):
             return screen_data
         return None
 
-if __name__ == '__main__':
+def main():
     parser = OptionParser(usage='%prog')
     parser.add_option("-u", "--udid",
                   default=False, action="store", dest="device_udid", metavar="DEVICE_UDID",
@@ -85,3 +85,5 @@ if __name__ == '__main__':
         o = open(outPath,'wb')
         o.write(data)
 
+if __name__ == "__main__":
+    main()

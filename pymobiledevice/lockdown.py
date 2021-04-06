@@ -397,8 +397,7 @@ class LockdownClient(object):
             plist_service.ssl_start(self.sslfile, self.sslfile)
         return plist_service
 
-
-if __name__ == "__main__":
+def main():
     logging.basicConfig(level=logging.INFO)
     logger = logging.getLogger(__name__)
     l = LockdownClient()
@@ -408,3 +407,5 @@ if __name__ == "__main__":
     else:
         logger.error("Unable to connect to device")
 
+if __name__ == "__main__":
+    main()

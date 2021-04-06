@@ -118,8 +118,7 @@ def get_apps_BundleID(lockdown,appType="User"):
     #pprint(appList)
     return appList
 
-
-if __name__ == "__main__":
+main():
     parser = OptionParser(usage="%prog")
     parser.add_option("-l", "--list", dest="list", action="store_true", default=False,
                   help="List installed applications (non system apps)")
@@ -141,3 +140,5 @@ if __name__ == "__main__":
     else:
         parser.print_help()
 
+if __name__ == "__main__":
+    main()

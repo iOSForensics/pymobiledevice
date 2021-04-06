@@ -208,8 +208,11 @@ class MobileBackup(object):
                     plistlib.writePlist(info.get("BackupFileInfo"), outpath + ".mdinfo")
                 f = None
 
-if __name__ == "__main__":
+def main():
     logging.basicConfig(level=logging.INFO)
     mb = MobileBackup()
     mb.request_backup()
 
+
+if __name__ == "__main__":
+    main()

@@ -152,8 +152,10 @@ def cb_test(name,data=None):
     print("Data:")
     pprint(data)
 
-
-if __name__ == "__main__":
+def main():
     np = NPClient()
     np.subscribe(NP_DEVICE_NAME_CHANGED, cb_test, data=None)
 
+
+if __name__ == "__main__":
+    main()

@@ -520,7 +520,7 @@ class MobileBackup2(MobileBackup):
         else:
             self.logger.info("Unhandled notification '%s'", notification)
 
-if __name__ == "__main__":
+def main():
     parser = OptionParser(usage="%prog -u <udid> cmd <command options>")
     parser.add_option("-u", "--udid", default=False, action="store", dest="device_udid", metavar="DEVICE_UDID",
                   help="Device udid")
@@ -550,3 +550,7 @@ if __name__ == "__main__":
         mb.list()
     else:
         parser.error("Incorrect number of arguments")
+
+
+if __name__ == "__main__":
+    main()

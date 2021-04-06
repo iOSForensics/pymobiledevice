@@ -210,8 +210,7 @@ class DIAGClient(object):
         return None
 
 
-if __name__ == "__main__":
-
+def main()
     parser = OptionParser(usage="%prog")
     parser.add_option("-c", "--cmd", dest="cmd", default=False,
                   help="Launch diagnostic command", type="string")
@@ -246,3 +245,6 @@ if __name__ == "__main__":
         for k in res.keys():
             print(" %s \t: %s" % (k,res[k]))
 
+
+if __name__ == "__main__":
+    main()

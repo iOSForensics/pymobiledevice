@@ -94,8 +94,7 @@ class FileRelay(object):
                     break
         return None
 
-if __name__ == "__main__":
-
+def main():
     parser = OptionParser(option_class=MultipleOption,usage="%prog")
     parser.add_option("-s", "--sources",
                       action="extend",
@@ -139,3 +138,6 @@ if __name__ == "__main__":
             gz = gzip.GzipFile(mode='rb', fileobj=f)
             cpio = CpioArchive(fileobj=BytesIO(gz.read()))
             cpio.extract_files(files=None,outpath=options.extractpath)
+
+if __name__ == "__main__":
+    main()
