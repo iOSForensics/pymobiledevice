@@ -21,11 +21,20 @@
 import socket, struct, select, sys
 from six import PY3
 
-try:
-	import plistlib
-	haveplist = True
-except:
-	haveplist = False
+
+haveplist = False
+if PY3:
+	try:
+		import plistlib
+		haveplist = True
+	except:
+		pass
+else:
+	try:
+		import biplist as plistlib
+		haveplist = True
+	except:
+		pass
 
 class MuxError(Exception):
 	pass
@@ -271,8 +280,10 @@ class UsbmuxdClient(MuxConnection):
 			pair_record = data['PairRecordData']
 			pair_record = plistlib.loads(pair_record)
 		else:
-			pair_record = data['PairRecordData'].data
-			pair_record = plistlib.readPlistFromString(pair_record)
+			pair_record = data['PairRecordData']
+			import pprint
+			pprint.pprint(pair_record)
+			pair_record = plistlib.readPlist(pair_record)
 		return pair_record
 
 

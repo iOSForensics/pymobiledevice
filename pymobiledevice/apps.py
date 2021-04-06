@@ -25,6 +25,7 @@
 from __future__ import print_function
 import os
 import warnings
+from pprint import *
 from pymobiledevice.lockdown import LockdownClient
 from pymobiledevice.afc import AFCClient, AFCShell
 from optparse import OptionParser
@@ -47,6 +48,7 @@ def house_arrest(lockdown, applicationId):
     mis.sendPlist({"Command": "VendDocuments", "Identifier": applicationId})
     res = mis.recvPlist()
     if res.get("Error"):
+        pprint(res)
         print("Unable to Lookup the selected application: You probably trying to access to a system app...")
         return None
     return AFCClient(lockdown, service=mis)

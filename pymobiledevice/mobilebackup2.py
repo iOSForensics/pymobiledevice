@@ -38,13 +38,19 @@ from time import mktime, gmtime, sleep, time
 from uuid import uuid4
 from stat import *
 
-from six import PY3
 from pymobiledevice.afc import AFCClient
 from pymobiledevice.installation_proxy import installation_proxy
 from pymobiledevice.notification_proxy import *
 from pymobiledevice.sbservices import SBServiceClient
 from pymobiledevice.lockdown import LockdownClient
 from pymobiledevice.mobilebackup import MobileBackup
+
+from six import PY3
+
+if PY3:
+    plistlib.readPlistFromString = plistlib.loads
+    plistlib.writePlistToString = plistlib.dumps
+    plistlib.readPlist = plistlib.load
 
 CODE_SUCCESS = 0x00
 CODE_ERROR_LOCAL =  0x06
@@ -438,7 +444,8 @@ class MobileBackup2(MobileBackup):
 
         info["iTunes Settings"] = self.lockdown.getValue("com.apple.iTunes")
         self.logger.info("Creating %s", os.path.join(self.udid,"Info.plist"))
-        self.write_file(os.path.join(self.udid,"Info.plist"), plistlib.writePlistToString(info))
+        plist_data = plistlib.writePlistToString(info)
+        self.write_file(os.path.join(self.udid,"Info.plist"), plist_data)
 
 
     def backup(self,fullBackup=True):
