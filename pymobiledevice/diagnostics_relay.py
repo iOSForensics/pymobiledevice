@@ -210,7 +210,7 @@ class DIAGClient(object):
         return None
 
 
-def main()
+def main():
     parser = OptionParser(usage="%prog")
     parser.add_option("-c", "--cmd", dest="cmd", default=False,
                   help="Launch diagnostic command", type="string")

@@ -118,7 +118,7 @@ def get_apps_BundleID(lockdown,appType="User"):
     #pprint(appList)
     return appList
 
-main():
+def main():
     parser = OptionParser(usage="%prog")
     parser.add_option("-l", "--list", dest="list", action="store_true", default=False,
                   help="List installed applications (non system apps)")
