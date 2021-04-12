@@ -36,12 +36,9 @@ from pymobiledevice3.ca import ca_do_everything
 from pymobiledevice3.util import readHomeFile, writeHomeFile, getHomePath
 from pymobiledevice3.usbmux import usbmux
 
-from six import PY3
-
-if PY3:
-    plistlib.readPlistFromString = plistlib.loads
-    plistlib.writePlistToString = plistlib.dumps
-    plistlib.readPlist = plistlib.load
+plistlib.readPlistFromString = plistlib.loads
+plistlib.writePlistToString = plistlib.dumps
+plistlib.readPlist = plistlib.load
 
 
 class NotTrustedError(Exception):
@@ -94,7 +91,7 @@ class LockdownClient(object):
         assert self.query_type() == "com.apple.mobile.lockdown"
 
         self.allValues = self.get_value()
-        self.udid = self.allValues.get("UniqueDeviceID").replace('-', '')
+        self.udid = self.allValues.get("UniqueDeviceID")#.replace('-', '')
         self.UniqueChipID = self.allValues.get("UniqueChipID")
         self.DevicePublicKey = self.allValues.get("DevicePublicKey")
         self.ios_version = self.allValues.get("ProductVersion")
@@ -179,27 +176,27 @@ class LockdownClient(object):
             logging.warning("Using iTunes pair record: %s.plist" % self.identifier)
         except:
             logging.warning(("No iTunes pairing record found for device %s" % self.identifier))
-            if self.compare_ios_version("13.0") >= 0:
-                self.logger.warning("Getting pair record from usbmuxd")
-                client = usbmux.UsbmuxdClient()
-                pair_record = client.get_pair_record(self.udid)
+            client = usbmux.UsbmuxdClient()
+            from pprint import pprint
+            pprint(self.udid)
+            pair_record = client.get_pair_record(self.udid)
+            #if self.compare_ios_version("13.0") >= 0:
+            #    self.logger.warning("Getting pair record from usbmuxd")
+            #    client = usbmux.UsbmuxdClient()
+            #    pair_record = client.get_pair_record(self.udid)
+            #else:
+            self.logger.warning("Looking for pymobiledevice3 pairing record")
+            record = readHomeFile(HOMEFOLDER, "%s.plist" % self.identifier)
+            if record:
+                pair_record = plistlib.readPlistFromString(record)
+                self.logger.warning("Found pymobiledevice3 pairing record for device %s" % self.udid)
             else:
-                self.logger.warning("Looking for pymobiledevice3 pairing record")
-                record = readHomeFile(HOMEFOLDER, "%s.plist" % self.identifier)
-                if record:
-                    pair_record = plistlib.readPlistFromString(record)
-                    self.logger.warning("Found pymobiledevice3 pairing record for device %s" % self.udid)
-                else:
-                    self.logger.error("No  pymobiledevice3 pairing record found for device %s" % self.identifier)
-                    return False
+                self.logger.error("No  pymobiledevice3 pairing record found for device %s" % self.identifier)
+                return False
         self.record = pair_record
 
-        if PY3:
-            certPem = pair_record["HostCertificate"]
-            privateKeyPem = pair_record["HostPrivateKey"]
-        else:
-            certPem = pair_record["HostCertificate"].data
-            privateKeyPem = pair_record["HostPrivateKey"].data
+        certPem = pair_record["HostCertificate"]
+        privateKeyPem = pair_record["HostPrivateKey"]
 
         if self.compare_ios_version("11.0") < 0:
             ValidatePair = {"Label": self.label, "Request": "ValidatePair", "PairRecord": pair_record}
@@ -218,9 +215,7 @@ class LockdownClient(object):
         self.SessionID = startsession.get("SessionID")
         if startsession.get("EnableSessionSSL"):
             self.sslfile = self.identifier + "_ssl.txt"
-            lf = "\n"
-            if PY3:
-                lf = b"\n"
+            lf = b"\n"
             self.sslfile = writeHomeFile(HOMEFOLDER, self.sslfile, certPem + lf + privateKeyPem)
             self.c.ssl_start(self.sslfile, self.sslfile)
 
@@ -256,12 +251,8 @@ class LockdownClient(object):
                     return False
         self.record = pair_record
 
-        if PY3:
-            certPem = pair_record["HostCertificate"]
-            privateKeyPem = pair_record["HostPrivateKey"]
-        else:
-            certPem = pair_record["HostCertificate"].data
-            privateKeyPem = pair_record["HostPrivateKey"].data
+        certPem = pair_record["HostCertificate"]
+        privateKeyPem = pair_record["HostPrivateKey"]
 
         if self.compare_ios_version("11.0") < 0:
             ValidatePair = {"Label": self.label, "Request": "ValidatePair", "PairRecord": pair_record}
@@ -280,9 +271,7 @@ class LockdownClient(object):
         self.SessionID = startsession.get("SessionID")
         if startsession.get("EnableSessionSSL"):
             self.sslfile = self.identifier + "_ssl.txt"
-            lf = "\n"
-            if PY3:
-                lf = b"\n"
+            lf = b"\n"
             self.sslfile = writeHomeFile(HOMEFOLDER, self.sslfile, certPem + lf + privateKeyPem)
             self.c.ssl_start(self.sslfile, self.sslfile)
 
@@ -297,20 +286,19 @@ class LockdownClient(object):
 
         self.logger.info("Creating host key & certificate")
         cert_pem, private_key_pem, device_certificate = ca_do_everything(self.DevicePublicKey)
-
-        pair_record = {"DevicePublicKey": plistlib.Data(self.DevicePublicKey),
-                       "DeviceCertificate": plistlib.Data(device_certificate),
-                       "HostCertificate": plistlib.Data(cert_pem),
+        pair_record = {"DevicePublicKey": self.DevicePublicKey,
+                       "DeviceCertificate": device_certificate,
+                       "HostCertificate": cert_pem,
                        "HostID": self.hostID,
-                       "RootCertificate": plistlib.Data(cert_pem),
+                       "RootCertificate": cert_pem,
                        "SystemBUID": "30142955-444094379208051516"}
 
         pair = {"Label": self.label, "Request": "Pair", "PairRecord": pair_record}
         self.c.send_plist(pair)
         pair = self.c.recv_plist()
 
-        if pair and pair.get("Result") == "Success" or pair.has_key("EscrowBag"):
-            pair_record["HostPrivateKey"] = plistlib.Data(private_key_pem)
+        if pair and pair.get("Result") == "Success" or pair.get("EscrowBag"):
+            pair_record["HostPrivateKey"] = private_key_pem
             pair_record["EscrowBag"] = pair.get("EscrowBag")
             writeHomeFile(HOMEFOLDER, "%s.plist" % self.identifier, plistlib.writePlistToString(pair_record))
             self.paired = True
