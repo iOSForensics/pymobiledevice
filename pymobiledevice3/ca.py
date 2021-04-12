@@ -40,7 +40,7 @@ def convert_pkcs1_to_pkcs8_pubkey(bitsdata):
     base64.MAXBINSIZE = (64 // 4) * 3
     res = b"-----BEGIN PUBLIC KEY-----\n"
     res += base64.b64encode(der_encoder.encode(pubkey_seq))
-    res += b"-----END PUBLIC KEY-----\n"
+    res += b"\n-----END PUBLIC KEY-----"
     return res
 
 
