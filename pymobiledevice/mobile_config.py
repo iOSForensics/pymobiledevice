@@ -2,7 +2,7 @@
 import plistlib
 import logging
 
-from pymobiledevice3.lockdown import LockdownClient
+from pymobiledevice.lockdown import LockdownClient
 
 
 class MobileConfigService(object):

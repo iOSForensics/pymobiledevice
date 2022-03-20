@@ -6,7 +6,7 @@ import logging
 import struct
 import ssl
 
-from pymobiledevice3.usbmux import usbmux
+from pymobiledevice.usbmux import usbmux
 
 
 class ConnectionFailedException(Exception):

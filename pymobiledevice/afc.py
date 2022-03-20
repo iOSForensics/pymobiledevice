@@ -9,8 +9,8 @@ import os
 
 from construct import Struct, Const, Int64ul, Container, Switch, Enum, Bytes, Tell, this
 
-from pymobiledevice3.lockdown import LockdownClient
-from pymobiledevice3.util import hexdump, parsePlist
+from pymobiledevice.lockdown import LockdownClient
+from pymobiledevice.util import hexdump, parsePlist
 
 MAXIMUM_READ_SIZE = 1 << 16
 MODE_MASK = 0o0000777
@@ -197,6 +197,7 @@ class AFCClient(object):
         return self.file_remove(dirname)
 
     def get_file_info(self, filename):
+        self.logger.info(filename.encode())
         return list_to_dict(self._do_operation(afc_opcode_t.AFC_OP_GET_FILE_INFO, filename.encode()))
 
     def make_link(self, target, linkname, type=AFC_SYMLINK):

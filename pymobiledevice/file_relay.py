@@ -3,11 +3,11 @@
 #
 # $Id$
 #
-# Copyright (c) 2012-2014 "dark[-at-]gotohack.org"
+# Copyright (c) 2012-2014 "dark[-at-]gotohack.io"
 #
-# This file is part of pymobiledevice3
+# This file is part of pymobiledevice
 #
-# pymobiledevice3 is free software: you can redistribute it and/or modify
+# pymobiledevice is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
@@ -24,10 +24,10 @@
 import gzip
 import logging
 
-from pymobiledevice3.lockdown import LockdownClient
-from pymobiledevice3.util.cpio import CpioArchive
-from pymobiledevice3.util import MultipleOption
-from pymobiledevice3.plist_service import ConnectionFailedException
+from pymobiledevice.lockdown import LockdownClient
+from pymobiledevice.util.cpio import CpioArchive
+from pymobiledevice.util import MultipleOption
+from pymobiledevice.plist_service import ConnectionFailedException
 
 from tempfile import mkstemp
 from optparse import OptionParser

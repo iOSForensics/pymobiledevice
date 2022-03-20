@@ -5,7 +5,7 @@
 import os
 import platform
 import sys
-from pymobiledevice3 import version as pm
+from pymobiledevice import version as pm
 from setuptools import setup, find_packages
 
 BASE_DIR = os.path.realpath(os.path.dirname(__file__))
@@ -14,7 +14,7 @@ VERSION = pm.VERSION
 
 def replace_version_py(version):
     content = """# -*- coding: utf-8 -*-
-'''pymobiledevice2
+'''pymobiledevice
 '''
 VERSION = '%(version)s'
 """
@@ -58,7 +58,7 @@ def get_description():
 if __name__ == "__main__":
     setup(
         version=generate_version(),
-        name="pymobiledevice3",
+        name="pymobiledevice",
         description="python implementation for libimobiledevice library",
         long_description=get_description(),
         long_description_content_type='text/markdown',
@@ -69,7 +69,7 @@ if __name__ == "__main__":
         author="DoronZ",
         install_requires=parse_requirements(),
         entry_points={
-            'console_scripts': ['pymobiledevice3=pymobiledevice3.cli:cli',
+            'console_scripts': ['pymobiledevice=pymobiledevice.cli:cli',
                                 ],
         },
         classifiers=[
@@ -79,6 +79,6 @@ if __name__ == "__main__":
         ],
         url="https://github.com/doronz88/pymobiledevice",
         project_urls={
-            "pymobiledevice3 Documentation": "https://github.com/iOSForensics/pymobiledevice"
+            "pymobiledevice Documentation": "https://github.com/iOSForensics/pymobiledevice"
         },
     )

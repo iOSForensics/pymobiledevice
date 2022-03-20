@@ -10,16 +10,16 @@ import IPython
 import click
 from pygments import highlight, lexers, formatters
 
-from pymobiledevice3.afc import AFCShell, AFCClient
-from pymobiledevice3.diagnostics_service import DiagnosticsService
-from pymobiledevice3.installation_proxy_service import InstallationProxyService
-from pymobiledevice3.lockdown import LockdownClient
-from pymobiledevice3.mobile_config import MobileConfigService
-from pymobiledevice3.notification_proxy_service import NotificationProxyService
-from pymobiledevice3.os_trace_service import OsTraceService
-from pymobiledevice3.pcapd_service import PcapdService
-from pymobiledevice3.screenshot_service import ScreenshotService
-from pymobiledevice3.dvt_secure_socket_proxy import DvtSecureSocketProxyService
+from pymobiledevice.afc import AFCShell, AFCClient
+from pymobiledevice.diagnostics_service import DiagnosticsService
+from pymobiledevice.installation_proxy_service import InstallationProxyService
+from pymobiledevice.lockdown import LockdownClient
+from pymobiledevice.mobile_config import MobileConfigService
+from pymobiledevice.notification_proxy_service import NotificationProxyService
+from pymobiledevice.os_trace_service import OsTraceService
+from pymobiledevice.pcapd_service import PcapdService
+from pymobiledevice.screenshot_service import ScreenshotService
+from pymobiledevice.dvt_secure_socket_proxy import DvtSecureSocketProxyService
 
 coloredlogs.install(level=logging.DEBUG)
 

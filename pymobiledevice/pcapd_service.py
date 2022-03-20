@@ -7,7 +7,7 @@ import sys
 
 import click
 
-from pymobiledevice3.lockdown import LockdownClient
+from pymobiledevice.lockdown import LockdownClient
 
 """
 struct pcap_hdr_s {

@@ -5,7 +5,7 @@ import logging
 
 from construct import Struct, Bytes, Int32ul, CString, Timestamp, Optional, Enum, Byte, Probe
 
-from pymobiledevice3.lockdown import LockdownClient
+from pymobiledevice.lockdown import LockdownClient
 
 CHUNK_SIZE = 4096
 TIME_FORMAT = '%H:%M:%S'

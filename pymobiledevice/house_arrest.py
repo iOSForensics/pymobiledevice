@@ -5,9 +5,9 @@
 #
 # Copyright (c) 2012-2014 "dark[-at-]gotohack.org"
 #
-# This file is part of pymobiledevice3
+# This file is part of pymobiledevice
 #
-# pymobiledevice3 is free software: you can redistribute it and/or modify
+# pymobiledevice is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
@@ -25,8 +25,8 @@
 import os
 import logging
 
-from pymobiledevice3.lockdown import LockdownClient
-from pymobiledevice3.afc import AFCClient, AFCShell
+from pymobiledevice.lockdown import LockdownClient
+from pymobiledevice.afc import AFCClient, AFCShell
 
 from pprint import pprint
 from optparse import OptionParser

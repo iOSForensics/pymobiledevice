@@ -5,9 +5,9 @@
 #
 # Copyright (c) 2012-2014 "dark[-at-]gotohack.org"
 #
-# This file is part of pymobiledevice3
+# This file is part of pymobiledevice
 #
-# pymobiledevice3 is free software: you can redistribute it and/or modify
+# pymobiledevice is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
@@ -31,10 +31,10 @@ import time
 import logging
 import re
 
-from pymobiledevice3.plist_service import PlistService
-from pymobiledevice3.ca import ca_do_everything
-from pymobiledevice3.util import readHomeFile, writeHomeFile, getHomePath
-from pymobiledevice3.usbmux import usbmux
+from pymobiledevice.plist_service import PlistService
+from pymobiledevice.ca import ca_do_everything
+from pymobiledevice.util import readHomeFile, writeHomeFile, getHomePath
+from pymobiledevice.usbmux import usbmux
 
 plistlib.readPlistFromString = plistlib.loads
 plistlib.writePlistToString = plistlib.dumps
@@ -66,8 +66,8 @@ class FatalPairingError(Exception):
     pass
 
 
-# we store pairing records and ssl keys in ~/.pymobiledevice3
-HOMEFOLDER = ".pymobiledevice3"
+# we store pairing records and ssl keys in ~/.pymobiledevice
+HOMEFOLDER = ".pymobiledevice"
 MAXTRIES = 20
 
 
@@ -185,13 +185,13 @@ class LockdownClient(object):
             #    client = usbmux.UsbmuxdClient()
             #    pair_record = client.get_pair_record(self.udid)
             #else:
-            self.logger.warning("Looking for pymobiledevice3 pairing record")
+            self.logger.warning("Looking for pymobiledevice pairing record")
             record = readHomeFile(HOMEFOLDER, "%s.plist" % self.identifier)
             if record:
                 pair_record = plistlib.readPlistFromString(record)
-                self.logger.warning("Found pymobiledevice3 pairing record for device %s" % self.udid)
+                self.logger.warning("Found pymobiledevice pairing record for device %s" % self.udid)
             else:
-                self.logger.error("No  pymobiledevice3 pairing record found for device %s" % self.identifier)
+                self.logger.error("No  pymobiledevice pairing record found for device %s" % self.identifier)
                 return False
         self.record = pair_record
 
@@ -241,13 +241,13 @@ class LockdownClient(object):
                 client = usbmux.UsbmuxdClient()
                 pair_record = client.get_pair_record(self.udid)
             else:
-                print("Looking for pymobiledevice3 pairing record")
+                print("Looking for pymobiledevice pairing record")
                 record = readHomeFile(HOMEFOLDER, "%s.plist" % self.identifier)
                 if record:
                     pair_record = plistlib.readPlistFromString(record)
-                    print("Found pymobiledevice3 pairing record for device %s" % self.udid)
+                    print("Found pymobiledevice pairing record for device %s" % self.udid)
                 else:
-                    print("No  pymobiledevice3 pairing record found for device %s" % self.identifier)
+                    print("No  pymobiledevice pairing record found for device %s" % self.identifier)
                     return False
         self.record = pair_record
 

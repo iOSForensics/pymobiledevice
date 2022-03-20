@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from pymobiledevice3.lockdown import LockdownClient
+from pymobiledevice.lockdown import LockdownClient
 
 Requests = """Goodbye
 All

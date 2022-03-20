@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import logging
 
-from pymobiledevice3.lockdown import LockdownClient
+from pymobiledevice.lockdown import LockdownClient
 
 
 class ScreenshotService(object):

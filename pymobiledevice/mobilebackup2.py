@@ -5,9 +5,9 @@
 #
 # Copyright (c) 2012-2014 "dark[-at-]gotohack.org"
 #
-# This file is part of pymobiledevice3
+# This file is part of pymobiledevice
 #
-# pymobiledevice3 is free software: you can redistribute it and/or modify
+# pymobiledevice is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
@@ -32,12 +32,12 @@ from time import mktime, gmtime
 from uuid import uuid4
 from stat import *
 
-from pymobiledevice3.afc import AFCClient
-from pymobiledevice3.installation_proxy_service import InstallationProxyService
-from pymobiledevice3.notification_proxy_service import *
-from pymobiledevice3.sbservices_service import SBServicesService
-from pymobiledevice3.lockdown import LockdownClient
-from pymobiledevice3.mobilebackup import MobileBackup
+from pymobiledevice.afc import AFCClient
+from pymobiledevice.installation_proxy_service import InstallationProxyService
+from pymobiledevice.notification_proxy_service import *
+from pymobiledevice.sbservices_service import SBServicesService
+from pymobiledevice.lockdown import LockdownClient
+from pymobiledevice.mobilebackup import MobileBackup
 
 CODE_SUCCESS = 0x00
 CODE_ERROR_LOCAL = 0x06
@@ -72,9 +72,9 @@ class MobileBackup2(MobileBackup):
         self.start()
 
     def start(self):
-        self.udid = lockdown.get_value("", "UniqueDeviceID")
-        self.willEncrypt = lockdown.get_value("com.apple.mobile.backup", "WillEncrypt")
-        self.escrowBag = lockdown.get_value('', 'EscrowBag')
+        self.udid = self.lockdown.get_value("", "UniqueDeviceID")
+        self.willEncrypt = self.lockdown.get_value("com.apple.mobile.backup", "WillEncrypt")
+        self.escrowBag = self.lockdown.get_value('', 'EscrowBag')
         self.afc = AFCClient(self.lockdown)  # We need this to create lock files
         self.service = self.lockdown.start_service("com.apple.mobilebackup2")
         if not self.service:
@@ -376,14 +376,19 @@ class MobileBackup2(MobileBackup):
                        "iTunesApplicationIDs", "iTunesPrefs", "iTunesPrefs.plist"]
         iTunesFilesDict = {}
         for i in iTunesFiles:
-            data = self.afc.get_file_contents("/iTunes_Control/iTunes/" + i)
-            if data:
-                iTunesFilesDict[i] = data
-
+            try:
+                data = self.afc.get_file_contents("/iTunes_Control/iTunes/" + i)
+                if data:
+                    iTunesFilesDict[i] = data
+            except:
+                pass
         info["iTunesFiles"] = iTunesFilesDict
-        iBooksData2 = self.afc.get_file_contents("/Books/iBooksData2.plist")
-        if iBooksData2:
-            info["iBooks Data 2"] = iBooksData2
+        try:
+            iBooksData2 = self.afc.get_file_contents("/Books/iBooksData2.plist")
+            if iBooksData2:
+                info["iBooks Data 2"] = iBooksData2
+        except:
+            info["iBooks Data 2"] = ""
 
         info["iTunes Settings"] = self.lockdown.get_value("com.apple.iTunes")
         self.logger.info("Creating %s", os.path.join(self.udid, "Info.plist"))
