@@ -4,3 +4,4 @@ future
 pyasn1
 six
 biplist
+hexdump
