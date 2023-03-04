@@ -31,7 +31,7 @@ import logging
 from optparse import OptionParser
 from pprint import pprint
 from time import mktime, gmtime
-from util import write_file, hexdump
+from pymobiledevice.util import write_file, hexdump
 from biplist import writePlist, readPlist, Data
 from struct import unpack, pack
 from time import mktime, gmtime, sleep, time
@@ -84,9 +84,9 @@ class MobileBackup2(MobileBackup):
 
 
     def start(self):
-        self.udid = lockdown.getValue("", "UniqueDeviceID")
-        self.willEncrypt = lockdown.getValue("com.apple.mobile.backup", "WillEncrypt")
-        self.escrowBag = lockdown.getValue('', 'EscrowBag')
+        self.udid = self.lockdown.getValue("", "UniqueDeviceID")
+        self.willEncrypt = self.lockdown.getValue("com.apple.mobile.backup", "WillEncrypt")
+        self.escrowBag = self.lockdown.getValue('', 'EscrowBag')
         self.afc = AFCClient(self.lockdown) #We need this to create lock files
         self.service = self.lockdown.startService("com.apple.mobilebackup2")
         #self.service = self.lockdown.startServiceWithEscrowBag("com.apple.mobilebackup2", self.escrowBag)
