@@ -27,6 +27,7 @@ import struct
 import time
 import sys
 import logging
+from hexdump import * 
 
 from pymobiledevice.lockdown import LockdownClient
 
@@ -108,10 +109,8 @@ def main():
     else:
         if options.output:
             path = options.output
-        else:
-            _,path = mkstemp(prefix="device_dump_",suffix=".pcap",dir=".")
-        print("Recording data to: %s" % path)
-        output = PcapOut(path)
+            output = PcapOut(path)
+            print("Recording data to: %s" % path)
 
     logging.basicConfig(level=logging.INFO)
     lockdown = LockdownClient(options.device_udid)
@@ -133,7 +132,6 @@ def main():
             interfacetype= d[0x19:hdrsize].strip("\x00")
             interfacetype = "b'"+"\\x".join("{:02x}".format(ord(c)) for c in interfacetype)+"'"
         t = time.time()
-        print(interfacetype, packet_size, t)
         packet = d[hdrsize:]
         assert packet_size == len(packet)
 
@@ -143,9 +141,13 @@ def main():
                 packet = b"\xBE\xEF" * 6 + b"\x08\x00" + packet
             else:
                 packet = "\xBE\xEF" * 6 + "\x08\x00" + packet
-        if not output.writePacket(packet):
-            break
-
+        
+        if options.output:
+            if not output.writePacket(packet):
+                break
+        else:
+            print(packet_size, t)
+            hexdump(packet)
 
 
 if __name__ == "__main__":
