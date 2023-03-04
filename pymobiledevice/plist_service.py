@@ -3,7 +3,7 @@
 #
 # $Id$
 #
-# Copyright (c) 2012-2014 "dark[-at-]gotohack.org"
+# Copyright (c) 2012-2023 "dark[-at-]gotohack.org"
 #
 # This file is part of pymobiledevice
 #
@@ -21,7 +21,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 #
-
 
 import plistlib
 import ssl
@@ -140,4 +139,4 @@ class PlistService(object):
         return self.send(l + payload)
 
     def ssl_start(self, keyfile, certfile):
-        self.s = ssl.wrap_socket(self.s, keyfile, certfile, ssl_version=ssl.PROTOCOL_TLSv1)
+        self.s = ssl.wrap_socket(self.s, keyfile, certfile)
