@@ -3,7 +3,7 @@
 #
 # $Id$
 #
-# Copyright (c) 2012-2014 "dark[-at-]gotohack.org"
+# Copyright (c) 2012-2023 "dark[-at-]gotohack.org"
 #
 # This file is part of pymobiledevice
 #
@@ -95,7 +95,7 @@ class LockdownClient(object):
         assert self.queryType() == "com.apple.mobile.lockdown"
 
         self.allValues = self.getValue()
-        self.udid = self.allValues.get("UniqueDeviceID").replace('-','')
+        self.udid = self.allValues.get("UniqueDeviceID")
         self.UniqueChipID = self.allValues.get("UniqueChipID")
         self.DevicePublicKey = self.allValues.get("DevicePublicKey")
         self.ios_version = self.allValues.get("ProductVersion")
