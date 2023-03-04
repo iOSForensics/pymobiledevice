@@ -13,7 +13,7 @@ VERSION = pm.VERSION
 
 def replace_version_py(version):
     content = """# -*- coding: utf-8 -*-
-'''pymobiledevice2
+'''pymobiledevice
 '''
 VERSION = '%(version)s'
 """
@@ -73,7 +73,6 @@ if __name__ == "__main__":
 'pydiagnosticsrelay=pymobiledevice.diagnostic_relay:main',
 'pyfilerelay=pymobiledevice.file_relay:main',
 'pyhousearrest=pymobiledevice.house_arrest:main',
-'pydeviceinfo=pymobiledevice.ideviceinfo:main',
 'pylockdown=pymobiledevice.lockdown:main',
 'pymobileconfig=pymobiledevice.mobile_config:main',
 'pymobilebackup=pymobiledevice.mobilebackup:main',
@@ -84,6 +83,7 @@ if __name__ == "__main__":
             "Programming Language :: Python :: 2.7",
             "Programming Language :: Python :: 3.6",
             "Programming Language :: Python :: 3.7",
+            "Programming Language :: Python :: 3.11",
         ],
         install_requires=parse_requirements(),
         url="https://github.com/iOSForensics/pymobiledevice",
