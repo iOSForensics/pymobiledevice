@@ -281,8 +281,6 @@ class UsbmuxdClient(MuxConnection):
 			pair_record = plistlib.loads(pair_record)
 		else:
 			pair_record = data['PairRecordData']
-			import pprint
-			pprint.pprint(pair_record)
 			pair_record = plistlib.readPlist(pair_record)
 		return pair_record
 
