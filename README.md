@@ -1,6 +1,6 @@
 # pymobiledevice
 
-[![GitHub license](https://img.shields.io/cran/l/devtools.svg)](LICENSE)
+[![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
 
 pymobiledevice is a cross-platform implementation of the mobiledevice library
 that talks the protocols to support iPhone®, iPod Touch®, iPad® and Apple TV® devices.
