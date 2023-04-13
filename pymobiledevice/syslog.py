@@ -31,7 +31,6 @@ from sys import exit
 from datetime import datetime
 from util import getHomePath
 from util import hexdump
-from sys import exit
 from optparse import OptionParser
 import time
 
