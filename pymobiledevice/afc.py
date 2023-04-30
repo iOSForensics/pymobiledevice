@@ -40,7 +40,6 @@ from past.builtins import xrange
 from six import PY3
 from pprint import pprint
 
-from pymobiledevice.lockdown import LockdownClient
 from pymobiledevice.util import hexdump, parsePlist
 
 MODEMASK =  0o0000777
@@ -229,7 +228,7 @@ class AFCClient(object):
             return
 
         for d in self.read_directory(dirname):
-            if d == "." or d == ".." or d == "":
+            if d in {".", "..", ""}:
                 continue
 
             info = self.get_file_info(dirname + "/" + d)
@@ -494,7 +493,7 @@ class AFCShell(Cmd):
                 os.makedirs(out_path, MODEMASK)
 
             for d in self.afc.read_directory(path):
-                if d == "." or d == ".." or d == "":
+                if d in {".", "..", ""}:
                     continue
                 self.do_pull(path + "/" + d + " " + out)
         else:
